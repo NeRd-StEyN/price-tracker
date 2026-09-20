@@ -394,7 +394,7 @@ router.post('/products/:id/scrape', async (req, res, next) => {
     }
 
     const startTime = Date.now();
-    const scrapeResult = await scrapeWithRetry(product.external_id);
+    const scrapeResult = await scrapeWithRetry(product.external_id, true);
     const durationMs = Date.now() - startTime;
     const errorCode = mapErrorCode(scrapeResult.status, scrapeResult.message);
 
@@ -493,36 +493,42 @@ router.post('/track', async (req, res, next) => {
     if (productError) throw new Error(`Database error: ${productError.message}`);
 
     const productId = productData.id;
-    const startTime = Date.now();
-    const scrapeResult = await scrapeWithRetry(extId);
-    const durationMs = Date.now() - startTime;
-    const errorCode = mapErrorCode(scrapeResult.status, scrapeResult.message);
+    
+    (async () => {
+      try {
+        const startTime = Date.now();
+        const scrapeResult = await scrapeWithRetry(extId, true);
+        const durationMs = Date.now() - startTime;
 
-    await supabase.from('scrape_logs').insert({
-      product_id: productId,
-      status: scrapeResult.status,
-      attempts: scrapeResult.attempts,
-      message: scrapeResult.message,
-      duration_ms: durationMs
-    });
+        await supabase.from('scrape_logs').insert({
+          product_id: productId,
+          status: scrapeResult.status,
+          attempts: scrapeResult.attempts,
+          message: scrapeResult.message,
+          duration_ms: durationMs
+        });
 
-    if (scrapeResult.ok && scrapeResult.data) {
-      const sd = scrapeResult.data;
-      await supabase.from('price_history').insert({
-        product_id: productId,
-        price: sd.price,
-        in_stock: sd.inStock
-      });
-    }
+        if (scrapeResult.ok && scrapeResult.data) {
+          const sd = scrapeResult.data;
+          await supabase.from('price_history').insert({
+            product_id: productId,
+            price: sd.price,
+            in_stock: sd.inStock
+          });
+        }
+      } catch (err) {
+        console.error('Background track scrape failed:', err);
+      }
+    })();
 
     // Invalidate search cache so new product appears immediately in search results
     await invalidateSearchCache();
 
     res.status(201).json({
-      message: 'Product tracked and scraped',
+      message: 'Product tracked, scraping in background',
       product: productData,
-      scrape_status: scrapeResult.status,
-      scraped_data: scrapeResult.data || null
+      scrape_status: 'pending',
+      scraped_data: null
     });
   } catch (err) {
     next(err);

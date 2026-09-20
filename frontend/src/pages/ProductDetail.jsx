@@ -408,23 +408,23 @@ export default function ProductDetail() {
               <AreaChart data={chartData} margin={{ top: 10, right: 20, bottom: 10, left: 10 }}>
                 <defs>
                   <linearGradient id="colorPrice" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%" stopColor="#34D399" stopOpacity={0.3}/>
-                    <stop offset="95%" stopColor="#34D399" stopOpacity={0}/>
+                    <stop offset="5%" stopColor="#000000" stopOpacity={0.08}/>
+                    <stop offset="95%" stopColor="#000000" stopOpacity={0}/>
                   </linearGradient>
                 </defs>
-                <CartesianGrid stroke="#223040" strokeDasharray="3 3" vertical={false} />
-                <XAxis dataKey="time" stroke="#9AA7B4" fontSize={11} tickLine={false} axisLine={false} dy={10} />
-                <YAxis stroke="#9AA7B4" fontSize={11} tickLine={false} axisLine={false} dx={-10} tickFormatter={(val) => `₹${val}`} domain={['dataMin - 10', 'dataMax + 10']} />
+                <CartesianGrid stroke="#E4E4E7" strokeDasharray="3 3" vertical={false} />
+                <XAxis dataKey="time" stroke="#71717A" fontSize={11} tickLine={false} axisLine={false} dy={10} />
+                <YAxis stroke="#71717A" fontSize={11} tickLine={false} axisLine={false} dx={-10} tickFormatter={(val) => `₹${val}`} domain={['dataMin - 10', 'dataMax + 10']} />
                 <Tooltip 
-                  contentStyle={{ backgroundColor: '#111820', borderRadius: '12px', border: '1px solid #223040', boxShadow: '0 10px 30px rgba(0,0,0,0.8)', color: '#E6EDF3' }}
-                  itemStyle={{ color: '#34D399', fontWeight: 'bold' }}
-                  labelStyle={{ color: '#9AA7B4', marginBottom: '4px', fontSize: '11px' }}
+                  contentStyle={{ backgroundColor: '#FFFFFF', borderRadius: '8px', border: '2px solid #000000', boxShadow: '4px 4px 0px rgba(0,0,0,1)', color: '#000000' }}
+                  itemStyle={{ color: '#000000', fontWeight: 'bold' }}
+                  labelStyle={{ color: '#71717A', marginBottom: '4px', fontSize: '11px' }}
                   formatter={(value, name, item) => [
                     `₹${value} (${item.payload.inStock ? 'In Stock' : 'Out of Stock'})`, 
                     'Price'
                   ]}
                 />
-                <Area type="monotone" dataKey="price" stroke="#34D399" strokeWidth={3} fillOpacity={1} fill="url(#colorPrice)" activeDot={{ r: 6, fill: '#34D399', stroke: '#E6EDF3', strokeWidth: 2 }} />
+                <Area type="monotone" dataKey="price" stroke="#000000" strokeWidth={2} fillOpacity={1} fill="url(#colorPrice)" activeDot={{ r: 6, fill: '#000000', stroke: '#FFFFFF', strokeWidth: 2 }} />
 
                 {/* Markers where stock hit 0 */}
                 {outOfStockPoints.map((pt, idx) => (
@@ -433,8 +433,8 @@ export default function ProductDetail() {
                     x={pt.time} 
                     y={pt.price} 
                     r={6} 
-                    fill="#F87171" 
-                    stroke="#E6EDF3" 
+                    fill="#FCA5A5" 
+                    stroke="#000000" 
                     strokeWidth={2}
                   />
                 ))}

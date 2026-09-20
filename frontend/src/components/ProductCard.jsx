@@ -141,7 +141,7 @@ export default function ProductCard({ product, onRetrack, onUntrack, isRetrackin
               onClick={(e) => e.stopPropagation()}
               title="Open in store"
               aria-label="Open in store"
-              className="w-9 h-9 min-w-[36px] min-h-[36px] rounded-lg bg-surface-2 text-text-muted border border-border hover:text-text hover:border-accent-border transition-colors flex items-center justify-center focus-visible:ring-2 focus-visible:ring-accent focus-visible:outline-none"
+              className="w-9 h-9 min-w-[36px] min-h-[36px] rounded-lg badge-neutral hover:bg-surface-2 transition-colors flex items-center justify-center focus-visible:ring-2 focus-visible:ring-accent focus-visible:outline-none"
             >
               <ExternalLink className="w-4 h-4 flex-shrink-0" />
             </a>
@@ -157,7 +157,7 @@ export default function ProductCard({ product, onRetrack, onUntrack, isRetrackin
               }}
               title="Untrack product"
               aria-label="Untrack product"
-              className="w-9 h-9 min-w-[36px] min-h-[36px] rounded-lg bg-surface-2 text-text-muted border border-border hover:bg-danger-bg hover:text-danger hover:border-danger-border transition-colors flex items-center justify-center focus-visible:ring-2 focus-visible:ring-accent focus-visible:outline-none"
+              className="w-9 h-9 min-w-[36px] min-h-[36px] rounded-lg badge-neutral hover:bg-[#FCA5A5] hover:text-[#DC2626] transition-colors flex items-center justify-center focus-visible:ring-2 focus-visible:ring-accent focus-visible:outline-none"
             >
               <Trash2 className="w-4 h-4 flex-shrink-0" />
             </button>

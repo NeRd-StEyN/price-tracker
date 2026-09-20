@@ -204,9 +204,13 @@ class RequestQueue {
     this.queue = [];
   }
 
-  enqueue(task) {
+  enqueue(task, priority = false) {
     return new Promise((resolve, reject) => {
-      this.queue.push({ task, resolve, reject });
+      if (priority) {
+        this.queue.unshift({ task, resolve, reject });
+      } else {
+        this.queue.push({ task, resolve, reject });
+      }
       this.processNext();
     });
   }
@@ -278,8 +282,8 @@ async function _scrapeWithRetryCore(product) {
 /**
  * Wraps _scrapeWithRetryCore in a global queue to strictly prevent 429 errors from bulk requests.
  */
-export async function scrapeWithRetry(product) {
-  return globalScrapeQueue.enqueue(() => _scrapeWithRetryCore(product));
+export async function scrapeWithRetry(product, priority = false) {
+  return globalScrapeQueue.enqueue(() => _scrapeWithRetryCore(product), priority);
 }
 
 /**

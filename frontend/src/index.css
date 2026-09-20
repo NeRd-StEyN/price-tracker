@@ -3,28 +3,29 @@
 @tailwind utilities;
 
 :root {
-  --bg: #0B0F14;
-  --surface: #111820;
-  --surface-2: #16202B;
-  --border: #223040;
-  --text: #E6EDF3;
-  --text-muted: #9AA7B4;
-  --accent: #5B8DEF;
-  --success: #34D399;
-  --warning: #FBBF24;
-  --danger: #F87171;
-  --neutral: #94A3B8;
+  --bg: #F4F4F5;
+  --surface: #FFFFFF;
+  --surface-2: #E4E4E7;
+  --border: #000000;
+  --text: #000000;
+  --text-muted: #3F3F46;
+  
+  --accent: #000000;
+  --success: #000000;
+  --warning: #000000;
+  --danger: #000000;
+  --neutral: #000000;
 
-  --accent-bg: rgba(91, 141, 239, 0.12);
-  --accent-border: rgba(91, 141, 239, 0.30);
-  --success-bg: rgba(52, 211, 153, 0.12);
-  --success-border: rgba(52, 211, 153, 0.30);
-  --warning-bg: rgba(251, 191, 36, 0.12);
-  --warning-border: rgba(251, 191, 36, 0.30);
-  --danger-bg: rgba(248, 113, 113, 0.12);
-  --danger-border: rgba(248, 113, 113, 0.30);
-  --neutral-bg: rgba(148, 163, 184, 0.12);
-  --neutral-border: rgba(148, 163, 184, 0.30);
+  --accent-bg: #F4F4F5;
+  --accent-border: #000000;
+  --success-bg: #86EFAC;
+  --success-border: #000000;
+  --warning-bg: #FDE047;
+  --warning-border: #000000;
+  --danger-bg: #FCA5A5;
+  --danger-border: #000000;
+  --neutral-bg: #E4E4E7;
+  --neutral-border: #000000;
 }
 
 @layer base {
@@ -42,92 +43,111 @@
 body { 
   overscroll-behavior: none; 
   background-color: var(--bg) !important;
-  background-image: 
-    radial-gradient(at 50% 0%, rgba(91, 141, 239, 0.06) 0px, transparent 60%);
+  background-image: radial-gradient(#D4D4D8 1px, transparent 1px);
+  background-size: 20px 20px;
   background-attachment: fixed;
   min-height: 100vh;
 }
 
 /* Custom Scrollbar */
 ::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
+  width: 12px;
+  height: 12px;
 }
 
 ::-webkit-scrollbar-track {
   background: var(--bg);
+  border-left: 2px solid #000;
 }
 
 ::-webkit-scrollbar-thumb {
-  background: var(--surface-2);
-  border-radius: 4px;
+  background: #000000;
+  border: 2px solid var(--bg);
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: var(--border);
+  background: #333333;
 }
 
-/* Glassmorphism / Card Panel Utilities */
+/* Neo-Brutalism Card Panel Utilities */
 .glass-panel {
   background: var(--surface) !important;
-  backdrop-filter: blur(16px) saturate(180%) !important;
-  -webkit-backdrop-filter: blur(16px) saturate(180%) !important;
-  border: 1px solid var(--border) !important;
-  box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.5) !important;
+  border: 2px solid var(--border) !important;
+  border-radius: 12px !important;
+  box-shadow: 6px 6px 0px 0px #000000 !important;
+  transition: all 0.2s cubic-bezier(0.25, 1, 0.5, 1) !important;
 }
 
 .glass-panel-hover {
-  transition: all 0.2s ease-in-out !important;
+  cursor: pointer;
 }
 
 .glass-panel-hover:hover {
-  background: var(--surface-2) !important;
-  border-color: rgba(91, 141, 239, 0.3) !important;
-  transform: translateY(-2px) !important;
-  box-shadow: 0 16px 36px -12px rgba(0, 0, 0, 0.6) !important;
+  background: var(--surface) !important;
+  transform: translate(-3px, -3px) !important;
+  box-shadow: 9px 9px 0px 0px #000000 !important;
+}
+
+.glass-panel-hover:active {
+  transform: translate(2px, 2px) !important;
+  box-shadow: 2px 2px 0px 0px #000000 !important;
 }
 
 .glass-input {
   background: var(--surface) !important;
-  border: 1px solid var(--border) !important;
+  border: 2px solid var(--border) !important;
+  border-radius: 8px !important;
   color: var(--text) !important;
+  box-shadow: 4px 4px 0px 0px #000000 !important;
+  transition: all 0.15s ease-in-out !important;
 }
 
 .glass-input:focus-within,
 .glass-input:focus {
-  border-color: var(--accent) !important;
-  box-shadow: 0 0 0 2px rgba(91, 141, 239, 0.2) !important;
+  transform: translate(2px, 2px) !important;
+  box-shadow: 2px 2px 0px 0px #000000 !important;
+  outline: none !important;
 }
 
 /* Badge Utilities */
 .badge-success {
   background-color: var(--success-bg);
-  border: 1px solid var(--success-border);
+  border: 2px solid var(--success-border);
   color: var(--success);
+  font-weight: 700;
+  box-shadow: 3px 3px 0px 0px #000;
 }
 
 .badge-warning {
   background-color: var(--warning-bg);
-  border: 1px solid var(--warning-border);
+  border: 2px solid var(--warning-border);
   color: var(--warning);
+  font-weight: 700;
+  box-shadow: 3px 3px 0px 0px #000;
 }
 
 .badge-danger {
   background-color: var(--danger-bg);
-  border: 1px solid var(--danger-border);
+  border: 2px solid var(--danger-border);
   color: var(--danger);
+  font-weight: 700;
+  box-shadow: 3px 3px 0px 0px #000;
 }
 
 .badge-neutral {
   background-color: var(--neutral-bg);
-  border: 1px solid var(--neutral-border);
+  border: 2px solid var(--neutral-border);
   color: var(--neutral);
+  font-weight: 700;
+  box-shadow: 3px 3px 0px 0px #000;
 }
 
 .badge-accent {
   background-color: var(--accent-bg);
-  border: 1px solid var(--accent-border);
+  border: 2px solid var(--accent-border);
   color: var(--accent);
+  font-weight: 700;
+  box-shadow: 3px 3px 0px 0px #000;
 }
 
 /* Tabular Numerals utility */
