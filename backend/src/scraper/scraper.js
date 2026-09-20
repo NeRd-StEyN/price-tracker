@@ -194,14 +194,46 @@ export async function scrapeProduct(productUrlOrId) {
 }
 
 
+class RequestQueue {
+  constructor(concurrency, delayMs) {
+    this.concurrency = Math.max(1, concurrency);
+    this.delayMs = delayMs;
+    this.active = 0;
+    this.queue = [];
+  }
+
+  enqueue(task) {
+    return new Promise((resolve, reject) => {
+      this.queue.push({ task, resolve, reject });
+      this.processNext();
+    });
+  }
+
+  async processNext() {
+    if (this.active >= this.concurrency || this.queue.length === 0) return;
+    this.active++;
+    const { task, resolve, reject } = this.queue.shift();
+    try {
+      const result = await task();
+      resolve(result);
+    } catch (err) {
+      reject(err);
+    } finally {
+      setTimeout(() => {
+        this.active--;
+        this.processNext();
+      }, this.delayMs);
+    }
+  }
+}
+
+// Global queue: Max 2 concurrent scrapes, with 1000ms delay between completions
+const globalScrapeQueue = new RequestQueue(2, 1000);
+
 /**
- * Wraps scrapeProduct with smart retry logic.
- *
- * - Up to 5 attempts for transient (5xx) errors with exponential backoff.
- * - Does NOT retry on permanent errors (404).
- * - Each attempt gets a fresh challenge, so there is no stale-token risk.
+ * Core scraping logic wrapped with smart retry.
  */
-export async function scrapeWithRetry(product) {
+async function _scrapeWithRetryCore(product) {
   const MAX_ATTEMPTS = 5;
   let lastError = null;
 
@@ -239,6 +271,13 @@ export async function scrapeWithRetry(product) {
     status: 'failed',
     message: lastError ? lastError.message : 'Unknown error'
   };
+}
+
+/**
+ * Wraps _scrapeWithRetryCore in a global queue to strictly prevent 429 errors from bulk requests.
+ */
+export async function scrapeWithRetry(product) {
+  return globalScrapeQueue.enqueue(() => _scrapeWithRetryCore(product));
 }
 
 /**
