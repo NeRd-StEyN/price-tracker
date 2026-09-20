@@ -9,22 +9,22 @@ function Navbar() {
 
   const navItems = [
     { path: '/', label: 'Dashboard', icon: Activity },
-    { path: '/search', label: 'Search & Track', icon: Search }
+    { path: '/search', label: 'Search', icon: Search }
   ];
 
   return (
-    <header className="fixed top-0 left-0 right-0 z-50 flex justify-center pt-4 pb-3 px-4 pointer-events-none">
-      <div className="glass-panel rounded-full px-6 py-3 flex items-center justify-between w-full max-w-5xl pointer-events-auto border border-border shadow-xl">
-        <Link to="/" className="flex items-center gap-3 group focus-visible:ring-2 focus-visible:ring-accent focus-visible:outline-none rounded-lg p-1">
-          <div className="w-9 h-9 rounded-xl badge-accent flex items-center justify-center shadow-sm">
-            <Package className="w-5 h-5 text-accent" />
+    <header className="fixed top-0 left-0 right-0 z-50 flex justify-center pt-3 sm:pt-4 pb-3 px-3 sm:px-4 pointer-events-none">
+      <div className="glass-panel rounded-full px-3 sm:px-6 py-2 sm:py-3 flex items-center justify-between w-full max-w-5xl pointer-events-auto border border-border shadow-xl">
+        <Link to="/" className="flex items-center gap-2 sm:gap-3 group focus-visible:ring-2 focus-visible:ring-accent focus-visible:outline-none rounded-lg p-1">
+          <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-xl badge-accent flex items-center justify-center shadow-sm flex-shrink-0">
+            <Package className="w-4 h-4 sm:w-5 sm:h-5 text-accent" />
           </div>
-          <span className="text-xl font-extrabold text-text tracking-tight flex items-center gap-1">
+          <span className="text-lg sm:text-xl font-extrabold text-text tracking-tight flex items-center gap-0.5 sm:gap-1">
             Price<span className="text-accent font-black">Pulse</span>
           </span>
         </Link>
 
-        <nav className="flex items-center gap-1.5 bg-surface-2/80 p-1.5 rounded-full border border-border">
+        <nav className="flex items-center gap-1 sm:gap-1.5 bg-surface-2/80 p-1 sm:p-1.5 rounded-full border border-border">
           {navItems.map((item) => {
             const isActive = location.pathname === item.path;
             const Icon = item.icon;
@@ -32,7 +32,7 @@ function Navbar() {
               <Link
                 key={item.path}
                 to={item.path}
-                className={`relative px-4 py-2 rounded-full text-sm font-semibold transition-all duration-200 flex items-center gap-2 focus-visible:ring-2 focus-visible:ring-accent focus-visible:outline-none ${
+                className={`relative px-3 sm:px-4 py-1.5 sm:py-2 rounded-full text-xs sm:text-sm font-semibold transition-all duration-200 flex items-center gap-1.5 sm:gap-2 focus-visible:ring-2 focus-visible:ring-accent focus-visible:outline-none ${
                   isActive ? 'text-accent' : 'text-text-muted hover:text-text'
                 }`}
               >
@@ -44,7 +44,7 @@ function Navbar() {
                   />
                 )}
                 <Icon className={`w-4 h-4 relative z-10 ${isActive ? 'text-accent' : 'text-text-muted'}`} />
-                <span className="relative z-10">{item.label}</span>
+                <span className="relative z-10 hidden xs:inline sm:inline">{item.label}</span>
               </Link>
             );
           })}
