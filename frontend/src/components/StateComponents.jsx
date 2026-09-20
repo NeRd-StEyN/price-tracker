@@ -25,19 +25,19 @@ export function ErrorState({ error, onRetry }) {
     <motion.div 
       initial={{ opacity: 0, scale: 0.95 }}
       animate={{ opacity: 1, scale: 1 }}
-      className="flex flex-col items-center justify-center p-12 glass-panel border border-danger-border rounded-[12px] text-center max-w-2xl mx-auto mt-12 shadow-xl"
+      className="flex flex-col items-center justify-center p-6 sm:p-12 glass-panel border border-danger-border rounded-[12px] text-center max-w-2xl mx-auto mt-6 sm:mt-12 shadow-xl"
     >
-      <div className="w-16 h-16 badge-danger rounded-2xl flex items-center justify-center mb-6">
-        <AlertTriangle className="w-8 h-8 text-danger" />
+      <div className="w-12 h-12 sm:w-16 sm:h-16 badge-danger rounded-2xl flex items-center justify-center mb-4 sm:mb-6">
+        <AlertTriangle className="w-6 h-6 sm:w-8 sm:h-8 text-danger" />
       </div>
-      <h2 className="text-2xl font-bold text-text mb-2">Service Exception</h2>
-      <p className="text-text-muted text-sm mb-8 max-w-md">
+      <h2 className="text-xl sm:text-2xl font-bold text-text mb-2">Service Exception</h2>
+      <p className="text-text-muted text-xs sm:text-sm mb-6 sm:mb-8 max-w-md">
         {error instanceof Error ? error.message : String(error)}
       </p>
       {onRetry && (
         <button 
           onClick={onRetry}
-          className="badge-danger px-6 py-2.5 rounded-xl font-semibold shadow-md hover:bg-danger hover:text-bg transition-all text-sm focus-visible:ring-2 focus-visible:ring-accent focus-visible:outline-none"
+          className="badge-danger px-5 sm:px-6 py-2 sm:py-2.5 rounded-xl font-semibold shadow-md hover:bg-danger hover:text-bg transition-all text-xs sm:text-sm focus-visible:ring-2 focus-visible:ring-accent focus-visible:outline-none"
         >
           Retry Request
         </button>
@@ -51,17 +51,17 @@ export function EmptyState({ title, description, actionText, onAction }) {
     <motion.div 
       initial={{ opacity: 0, scale: 0.95 }}
       animate={{ opacity: 1, scale: 1 }}
-      className="flex flex-col items-center justify-center p-12 md:p-16 glass-panel border border-dashed border-border rounded-[12px] text-center max-w-2xl mx-auto mt-8 shadow-xl"
+      className="flex flex-col items-center justify-center p-6 sm:p-12 md:p-16 glass-panel border border-dashed border-border rounded-[12px] text-center max-w-2xl mx-auto mt-6 sm:mt-8 shadow-xl"
     >
-      <div className="w-20 h-20 bg-surface-2 rounded-2xl flex items-center justify-center mb-6 border border-border shadow-inner">
-        <PackageOpen className="w-10 h-10 text-accent" />
+      <div className="w-14 h-14 sm:w-20 sm:h-20 bg-surface-2 rounded-2xl flex items-center justify-center mb-4 sm:mb-6 border border-border shadow-inner">
+        <PackageOpen className="w-7 h-7 sm:w-10 sm:h-10 text-accent" />
       </div>
-      <h2 className="text-2xl font-extrabold text-text mb-2">{title}</h2>
-      <p className="text-text-muted text-sm md:text-base mb-8 max-w-md leading-relaxed">{description}</p>
+      <h2 className="text-xl sm:text-2xl font-extrabold text-text mb-2">{title}</h2>
+      <p className="text-text-muted text-xs sm:text-sm md:text-base mb-6 sm:mb-8 max-w-md leading-relaxed">{description}</p>
       {onAction && actionText && (
         <button 
           onClick={onAction}
-          className="bg-accent text-bg px-8 py-3 rounded-xl font-bold shadow-md hover:bg-accent/90 transition-all text-sm focus-visible:ring-2 focus-visible:ring-accent focus-visible:outline-none"
+          className="bg-accent text-bg px-6 sm:px-8 py-2.5 sm:py-3 rounded-xl font-bold shadow-md hover:bg-accent/90 transition-all text-xs sm:text-sm focus-visible:ring-2 focus-visible:ring-accent focus-visible:outline-none"
         >
           {actionText}
         </button>
