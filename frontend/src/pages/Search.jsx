@@ -179,15 +179,15 @@ export default function Search() {
       {/* Category Filter Chips & Result Counter */}
       {results.length > 0 && (
         <div className="flex flex-col sm:flex-row items-center justify-between gap-4 mb-6">
-          <div className="flex items-center gap-1.5 overflow-x-auto w-full sm:w-auto pb-1 sm:pb-0 scrollbar-none">
+          <div className="flex items-center gap-2 overflow-x-auto w-full sm:w-auto pb-2 pr-2 pl-1 pt-1 scrollbar-none">
             {availableCategories.map(cat => (
               <button
                 key={cat}
                 onClick={() => setSelectedCategory(cat)}
-                className={`px-3 py-1.5 rounded-xl text-xs font-semibold whitespace-nowrap transition-all border focus-visible:ring-2 focus-visible:ring-accent focus-visible:outline-none ${
+                className={`px-3 py-1.5 rounded-xl text-xs font-semibold whitespace-nowrap transition-all focus-visible:ring-2 focus-visible:ring-accent focus-visible:outline-none ${
                   selectedCategory === cat
-                    ? 'badge-accent shadow-sm'
-                    : 'bg-surface-2 text-text-muted border-border hover:text-text'
+                    ? 'badge-accent'
+                    : 'badge-neutral bg-surface hover:bg-surface-2 hover:text-text'
                 }`}
               >
                 {cat}

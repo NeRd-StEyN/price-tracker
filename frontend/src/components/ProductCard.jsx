@@ -39,7 +39,7 @@ export default function ProductCard({ product, onRetrack, onUntrack, isRetrackin
       <div>
         {/* Top Header Row: Category Icon + Badges */}
         <div className="flex items-start justify-between gap-3 mb-4">
-          <div className="w-10 h-10 rounded-xl bg-surface-2 border border-border flex items-center justify-center text-accent group-hover:border-accent-border transition-colors flex-shrink-0">
+          <div className="w-10 h-10 rounded-xl badge-neutral bg-surface flex items-center justify-center text-accent group-hover:bg-surface-2 transition-colors flex-shrink-0">
             <CategoryIcon className="w-5 h-5 text-accent" />
           </div>
 

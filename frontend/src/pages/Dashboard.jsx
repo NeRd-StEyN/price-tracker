@@ -233,7 +233,7 @@ export default function Dashboard() {
           <button 
             onClick={() => loadData(true)}
             disabled={refreshing}
-            className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-surface-2 text-text border border-border hover:border-accent-border text-[13px] font-semibold transition-all shadow-sm disabled:opacity-50 focus-visible:ring-2 focus-visible:ring-accent focus-visible:outline-none"
+            className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl badge-neutral hover:bg-surface-2 text-[13px] font-semibold transition-all focus-visible:ring-2 focus-visible:ring-accent focus-visible:outline-none"
             title="Refresh dashboard stats & data"
             aria-label="Refresh dashboard stats & data"
           >
@@ -255,7 +255,7 @@ export default function Dashboard() {
           <button 
             onClick={handleUntrackAll}
             disabled={untrackingAll}
-            className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-surface-2 text-text-muted border border-border hover:bg-danger-bg hover:text-danger hover:border-danger-border text-[13px] font-semibold transition-all shadow-sm disabled:opacity-50 focus-visible:ring-2 focus-visible:ring-accent focus-visible:outline-none"
+            className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl badge-neutral hover:bg-[#FCA5A5] hover:text-[#DC2626] text-[13px] font-semibold transition-all focus-visible:ring-2 focus-visible:ring-accent focus-visible:outline-none"
             title="Delete / Untrack all products from database"
             aria-label="Delete All"
           >
@@ -320,12 +320,12 @@ export default function Dashboard() {
             value={searchFilter}
             onChange={(e) => setSearchFilter(e.target.value)}
             placeholder="Filter by name, brand, SKU..."
-            className="w-full bg-surface-2 border border-border rounded-xl pl-10 pr-4 py-2 text-sm text-text placeholder:text-text-muted focus:outline-none focus:border-accent"
+            className="w-full glass-input rounded-xl pl-10 pr-4 py-2 text-[13px] font-semibold text-text placeholder:text-text-muted"
           />
         </div>
 
         {/* Status Filter Chips (Active chip = --accent per STEP 1) */}
-        <div className="flex items-center gap-1.5 overflow-x-auto pb-1 md:pb-0 scrollbar-none">
+        <div className="flex items-center gap-2 overflow-x-auto pb-2 pr-2 pl-1 pt-1 scrollbar-none">
           {[
             { key: 'all', label: 'All' },
             { key: 'in_stock', label: 'In stock' },
@@ -336,10 +336,10 @@ export default function Dashboard() {
             <button
               key={chip.key}
               onClick={() => setStatusFilter(chip.key)}
-              className={`px-3 py-1.5 rounded-xl text-xs font-semibold whitespace-nowrap transition-all border focus-visible:ring-2 focus-visible:ring-accent focus-visible:outline-none ${
+              className={`px-3 py-1.5 rounded-xl text-xs font-semibold whitespace-nowrap transition-all focus-visible:ring-2 focus-visible:ring-accent focus-visible:outline-none ${
                 statusFilter === chip.key
-                  ? 'badge-accent shadow-sm'
-                  : 'bg-surface-2 text-text-muted border-border hover:text-text'
+                  ? 'badge-accent'
+                  : 'badge-neutral bg-surface hover:bg-surface-2 hover:text-text'
               }`}
             >
               {chip.label}
@@ -353,7 +353,7 @@ export default function Dashboard() {
           <select
             value={sortBy}
             onChange={(e) => setSortBy(e.target.value)}
-            className="bg-surface-2 text-text border border-border rounded-xl px-3 py-2 text-xs font-semibold focus:outline-none focus:border-accent cursor-pointer"
+            className="glass-input rounded-xl px-3 py-2 text-[13px] font-semibold cursor-pointer"
           >
             <option value="recent">Recently Scraped</option>
             <option value="price_asc">Price: Low to High</option>

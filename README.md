@@ -1,50 +1,48 @@
-# PricePulse ⚡ Price Tracker
+# INE Intern Assignment - Product Price Tracker
 
-**PricePulse** is a modern price tracking and telemetry surveillance application designed for e-commerce monitoring. Built with React, Vite, Express, and Supabase, it provides automated background scraping, price drop tracking, and real-time telemetry analytics.
+A high-performance, full-stack web application built for the INE Software Engineer Intern Assignment. It tracks product prices and stock availability from a custom mock store over time, featuring an ultra-fast backend scraper, a resilient PostgreSQL database (Supabase), and a Neo-Brutalist React dashboard.
 
----
+## Live Demo
+- **Frontend**: [Your Vercel URL Here]
+- **Backend**: https://price-tracker-backend-6kew.onrender.com
 
-## 🌟 Key Features
+## Tech Stack
+- **Frontend**: React (Vite) + Tailwind CSS (deployed on Vercel)
+- **Backend**: Node.js + Express (deployed on Render)
+- **Database**: Supabase (PostgreSQL)
 
-- **Dark Teal Glassmorphism UI:** Built with React, Tailwind CSS, Lucide icons, and Framer Motion.
-- **Fast Reverse-Engineered Scraper:** Bypasses browser overhead using a native Node.js WebAssembly Proof-of-Work solver (<100ms execution time).
-- **INR Currency Formatting:** Formatted using `Intl.NumberFormat("en-IN")` for prices and MRP discounts.
-- **3-State Stock Tracking:** Accurately distinguishes between `In Stock`, `Out of Stock`, and `Unknown` (never scraped).
-- **Background Scrape Scheduler:** Automated background worker checks tracked products according to user-configured intervals (`1h`, `2h`, `6h`, `12h`, `24h`).
-- **Telemetry & Price Trajectory:** Recharts price trajectory graphs with markers for zero-stock events and raw telemetry log tables.
-- **Global Batch Management:** Includes **Retrack All** and **Delete All** controls directly from the Dashboard toolbar.
+## Scraping & Scheduling Configuration
 
----
+### The Scraper
+The mock store features a client-side anti-bot puzzle (WASM proof-of-work) to prevent automated fetching. Instead of relying on a slow, resource-heavy headless browser (like Playwright/Puppeteer), the scraper **reverse-engineers the WASM cryptographic challenge** natively in Node.js. 
 
-## 🚀 Getting Started
+This allows for incredibly fast, lightweight HTTP fetching that bypasses the anti-bot firewall in milliseconds.
 
-### Prerequisites
-- **Node.js:** v18 or higher
-- **Supabase Account:** Database URL and Service Role Key
+### Scheduled Execution (cron-job.org)
+Because this project is deployed on Render's free tier, the instance automatically sleeps after 15 minutes of inactivity. To keep the scraper running unattended indefinitely:
 
-### 1. Backend Setup
-```bash
-cd backend
-npm install
-```
+1. **Keep-Alive Ping (Every 14 minutes):**
+   - URL: `https://price-tracker-backend-6kew.onrender.com/health`
+   - Method: `GET`
+   - Purpose: Prevents the Render instance from going to sleep.
 
+2. **Trigger Scrape (Every 2 hours):**
+   - URL: `https://price-tracker-backend-6kew.onrender.com/api/products/scrape-all`
+   - Method: `POST`
+   - Purpose: Initiates the background scrape queue for all tracked products.
+   - Note: The backend uses a specialized sequential queue with a strict 1500ms delay between requests to completely avoid `429 Too Many Requests` bans from the mock store during bulk operations.
+
+## Local Setup Instructions
+
+### 1. Database (Supabase)
+Create a new Supabase project and run the provided SQL scripts (if any) to generate the `products`, `scrape_logs`, and `price_history` tables.
+
+### 2. Environment Variables
 Create a `.env` file in the `backend/` directory:
 ```env
 PORT=3000
-SUPABASE_URL=your_supabase_url
-SUPABASE_SERVICE_ROLE_KEY=your_supabase_service_role_key
-FRONTEND_URL=http://localhost:5173
-```
-
-Start the backend server:
-```bash
-npm run dev
-```
-
-### 2. Frontend Setup
-```bash
-cd frontend
-npm install
+SUPABASE_URL=your_supabase_project_url
+SUPABASE_SERVICE_KEY=your_supabase_service_role_key
 ```
 
 Create a `.env` file in the `frontend/` directory:
@@ -52,31 +50,27 @@ Create a `.env` file in the `frontend/` directory:
 VITE_API_URL=http://localhost:3000
 ```
 
-Start the frontend dev server:
+### 3. Run Locally
+Start the backend:
 ```bash
+cd backend
+npm install
 npm run dev
 ```
 
----
+Start the frontend:
+```bash
+cd frontend
+npm install
+npm run dev
+```
 
-## 🛠️ API Contract Endpoints
+## Headed Mode Recording (Grading Requirement)
+The grading rubric requests a screen recording of the scraper running in a "headed" browser. Because our primary scraper is highly optimized and runs completely headlessly via raw HTTP/WASM execution, we have provided a secondary fallback script specifically for this grading requirement.
 
-| Method | Endpoint | Description |
-| :--- | :--- | :--- |
-| `GET` | `/api/stats` | Summary metric counts for dashboard cards. |
-| `GET` | `/api/search?q=query` | Fast catalog & tracked product search. |
-| `GET` | `/api/products` | Retrieve all tracked products formatted strictly. |
-| `GET` | `/api/products/:id` | Single product details with min/max/avg stats. |
-| `GET` | `/api/products/:id/history?range=...` | Price history for trajectory charting (oldest first). |
-| `GET` | `/api/products/:id/logs?limit=...` | Scrape telemetry logs (newest first). |
-| `POST` | `/api/track` | Add a product to the surveillance tracker. |
-| `POST` | `/api/products/:id/scrape` | Trigger rescrape for a single product (rate-limited 1/30s). |
-| `POST` | `/api/products/scrape-all` | Trigger rescrape for all tracked products. |
-| `PATCH` | `/api/products/:id` | Update product scrape interval. |
-| `DELETE` | `/api/products/:id` | Untrack a single product. |
-| `DELETE` | `/api/products` | Untrack all products. |
-
----
-
-## 📜 License
-MIT License.
+To run the headed Playwright script and record your video:
+```bash
+cd backend
+npm run scrape:headed
+```
+This will open a visible Chromium window, navigate to a product, bypass the anti-bot challenge by simulating human mouse movements, extract the price, and log it to the terminal.

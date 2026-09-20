@@ -66,12 +66,51 @@ async function fetchWithTimeout(url, options = {}, timeoutMs = 15000) {
   }
 }
 
+let lastHtmlHash = null;
+let lastHtmlCheckTime = 0;
+
+/**
+ * Bonus Feature: Store HTML Change Detection
+ * Fetches the root HTML, strips dynamic content, and hashes it.
+ * Flags a warning if the store's structure has changed since last check.
+ */
+async function checkStoreHtmlChanges() {
+  const now = Date.now();
+  if (now - lastHtmlCheckTime < 60 * 60 * 1000) return; // Only check once per hour
+  lastHtmlCheckTime = now;
+  try {
+    const res = await fetchWithTimeout(BASE_URL, { method: 'GET' }, 5000);
+    if (!res.ok) return;
+    const html = await res.text();
+    
+    // Strip scripts, styles, and numbers to isolate just the structural DOM layout
+    const structureOnly = html
+      .replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, '')
+      .replace(/<style\b[^<]*(?:(?!<\/style>)<[^<]*)*<\/style>/gi, '')
+      .replace(/[0-9]+/g, '');
+      
+    const currentHash = sha256(structureOnly);
+    
+    if (lastHtmlHash && lastHtmlHash !== currentHash) {
+      console.warn('\n⚠️ ⚠️ [CHANGE DETECTION ALERT] ⚠️ ⚠️');
+      console.warn('The mock store HTML structure has been modified by INE!');
+      console.warn('Scraping logic may require an update if the WASM bridge broke.\n');
+    }
+    lastHtmlHash = currentHash;
+  } catch (err) {
+    // Fail silently, don't interrupt scraping
+  }
+}
+
 /**
  * Scrape a specific product by directly interacting with the backend API.
  * Bypasses the client-side anti-bot check completely by solving the
  * cryptographic challenge natively in Node.js.
  */
 export async function scrapeProduct(productUrlOrId) {
+  // Bonus: Check for structural HTML changes
+  await checkStoreHtmlChanges();
+
   // Extract numeric ID from URL or use directly
   let productId = productUrlOrId;
   if (String(productUrlOrId).startsWith('http')) {
