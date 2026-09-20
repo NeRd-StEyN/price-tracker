@@ -76,7 +76,7 @@ export default function Layout({ children }) {
         <Navbar />
 
         <main className="relative flex-grow pt-28 pb-16 px-4 w-full max-w-7xl mx-auto">
-          {/* Cold-start Banner: Shown ONLY when request > 3s */}
+          {}
           <AnimatePresence>
             {showSlowWarning && (
               <motion.div

@@ -9,7 +9,7 @@ export async function runAllScrapes() {
   const startTime = Date.now();
 
   try {
-    // Fetch all tracked products
+    
     const { data: products, error } = await supabase.from('products').select('*');
     if (error) throw error;
     
@@ -24,7 +24,7 @@ export async function runAllScrapes() {
         try {
           result = await scrapeWithRetry(product.external_id || product.url);
         } catch (err) {
-          // Fallback catch if scrapeWithRetry throws instead of returning object
+          
           result = {
             ok: false,
             attempts: 3,
@@ -35,7 +35,6 @@ export async function runAllScrapes() {
         
         const durationMs = Date.now() - scrapeStart;
 
-        // Insert into scrape_logs always
         const { error: logErr } = await supabase.from('scrape_logs').insert({
           product_id: product.id,
           status: result.status,
@@ -46,7 +45,6 @@ export async function runAllScrapes() {
         
         if (logErr) console.error(`Log DB error for ${product.id}:`, logErr);
 
-        // If successful, insert into price_history
         if (result.ok && result.data) {
           const { error: histErr } = await supabase.from('price_history').insert({
             product_id: product.id,
@@ -63,8 +61,6 @@ export async function runAllScrapes() {
           console.log(`[FAILED] ${product.name}: ${result.message}`);
         }
 
-        // Polite delay between products – gives the upstream demo server breathing room
-        // to avoid triggering 503 "upstream_error" responses
         await new Promise(resolve => setTimeout(resolve, 1500));
       }
     }

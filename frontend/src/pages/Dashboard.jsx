@@ -41,10 +41,9 @@ export default function Dashboard() {
   const [retrackingIds, setRetrackingIds] = useState(new Set());
   const [toastMessage, setToastMessage] = useState(null);
 
-  // Filters & Sorting
   const [searchFilter, setSearchFilter] = useState('');
-  const [statusFilter, setStatusFilter] = useState('all'); // 'all' | 'in_stock' | 'out_of_stock' | 'unknown' | 'failing'
-  const [sortBy, setSortBy] = useState('recent'); // 'recent' | 'price_asc' | 'price_desc' | 'biggest_drop' | 'name'
+  const [statusFilter, setStatusFilter] = useState('all'); 
+  const [sortBy, setSortBy] = useState('recent'); 
   const [displayCount, setDisplayCount] = useState(12);
 
   const navigate = useNavigate();
@@ -78,7 +77,6 @@ export default function Dashboard() {
     return () => clearInterval(intervalId);
   }, []);
 
-  // Single Scrape / Retrack Handler
   const handleRetrackSingle = async (productId) => {
     setRetrackingIds(prev => new Set(prev).add(productId));
     try {
@@ -96,7 +94,6 @@ export default function Dashboard() {
     }
   };
 
-  // Single Untrack / Delete Handler
   const handleUntrackSingle = async (productId, productName) => {
     if (!window.confirm(`Are you sure you want to untrack "${productName || 'this product'}"?`)) return;
 
@@ -110,7 +107,6 @@ export default function Dashboard() {
     }
   };
 
-  // Retrack All Handler
   const handleRetrackAll = async () => {
     setRetrackingAll(true);
     try {
@@ -124,7 +120,6 @@ export default function Dashboard() {
     }
   };
 
-  // Untrack All / Delete All Handler
   const handleUntrackAll = async () => {
     if (!window.confirm('CAUTION: Are you sure you want to UNTRACK & DELETE ALL products? This action cannot be undone.')) {
       return;
@@ -143,10 +138,9 @@ export default function Dashboard() {
     }
   };
 
-  // Filter & Sort Logic
   const filteredProducts = useMemo(() => {
     return products.filter(p => {
-      // Text Filter (name, brand, sku, category)
+      
       if (searchFilter.trim()) {
         const q = searchFilter.toLowerCase();
         const matchName = p.name && p.name.toLowerCase().includes(q);
@@ -156,7 +150,6 @@ export default function Dashboard() {
         if (!matchName && !matchBrand && !matchSku && !matchCategory) return false;
       }
 
-      // Status Filter
       if (statusFilter === 'in_stock') return p.stock_state === 'in_stock';
       if (statusFilter === 'out_of_stock') return p.stock_state === 'out_of_stock';
       if (statusFilter === 'unknown') return p.stock_state === 'unknown';
@@ -177,12 +170,12 @@ export default function Dashboard() {
       if (sortBy === 'biggest_drop') {
         const dropA = a.price_change_pct !== null ? a.price_change_pct : 0;
         const dropB = b.price_change_pct !== null ? b.price_change_pct : 0;
-        return dropA - dropB; // Most negative drop first
+        return dropA - dropB; 
       }
       if (sortBy === 'name') {
         return a.name.localeCompare(b.name);
       }
-      // 'recent' default sort
+      
       const timeA = a.last_attempt ? new Date(a.last_attempt.scraped_at).getTime() : 0;
       const timeB = b.last_attempt ? new Date(b.last_attempt.scraped_at).getTime() : 0;
       return timeB - timeA;
@@ -206,7 +199,7 @@ export default function Dashboard() {
 
   return (
     <div className="flex flex-col w-full relative">
-      {/* Toast Notification Banner */}
+      {}
       {toastMessage && (
         <motion.div 
           initial={{ opacity: 0, y: -20 }}
@@ -219,7 +212,7 @@ export default function Dashboard() {
         </motion.div>
       )}
 
-      {/* Page Header */}
+      {}
       <div className="mb-6 flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
           <h1 className="text-3xl font-extrabold text-text tracking-tight mb-1">
@@ -228,7 +221,7 @@ export default function Dashboard() {
           <p className="text-text-muted text-sm">Real-time marketplace price tracking & automated telemetry monitoring.</p>
         </div>
 
-        {/* Global Action Toolbar: Refresh, Scrape All, Delete All */}
+        {}
         <div className="flex items-center gap-2 flex-wrap">
           <button 
             onClick={() => loadData(true)}
@@ -265,7 +258,7 @@ export default function Dashboard() {
         </div>
       </div>
 
-      {/* Summary Stat Cards */}
+      {}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4 mb-8">
         <StatCard 
           title="Tracked" 
@@ -309,10 +302,10 @@ export default function Dashboard() {
         />
       </div>
 
-      {/* Toolbar: Text Filter, Status Filter Chips, Sorting */}
+      {}
       <div className="glass-panel p-4 rounded-[12px] mb-6 flex flex-col md:flex-row items-stretch md:items-center justify-between gap-4 border border-border">
         
-        {/* Text Filter */}
+        {}
         <div className="relative flex-grow max-w-md">
           <Search className="w-4 h-4 text-text-muted absolute left-3.5 top-1/2 -translate-y-1/2" />
           <input 
@@ -324,7 +317,7 @@ export default function Dashboard() {
           />
         </div>
 
-        {/* Status Filter Chips (Active chip = --accent per STEP 1) */}
+        {}
         <div className="flex items-center gap-2 overflow-x-auto pb-2 pr-2 pl-1 pt-1 scrollbar-none">
           {[
             { key: 'all', label: 'All' },
@@ -347,7 +340,7 @@ export default function Dashboard() {
           ))}
         </div>
 
-        {/* Sort Select */}
+        {}
         <div className="flex items-center gap-2">
           <SlidersHorizontal className="w-4 h-4 text-text-muted hidden lg:block" />
           <select
@@ -364,7 +357,7 @@ export default function Dashboard() {
         </div>
       </div>
 
-      {/* Product Cards Grid */}
+      {}
       {filteredProducts.length > 0 ? (
         <>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 mb-8">
@@ -379,7 +372,7 @@ export default function Dashboard() {
             ))}
           </div>
 
-          {/* Pagination / Load More */}
+          {}
           {displayCount < filteredProducts.length && (
             <div className="flex justify-center mt-4">
               <button

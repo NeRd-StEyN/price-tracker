@@ -1,10 +1,6 @@
 import React from 'react';
 import { CheckCircle2, AlertCircle, HelpCircle, Clock, TrendingDown, TrendingUp, Minus } from 'lucide-react';
 
-/**
- * Stock Badge (3 states: in_stock, out_of_stock, unknown).
- * Displays real stock units (e.g. "23 left") only if a genuine count > 1 exists.
- */
 export function StockBadge({ stockState, stockUnits }) {
   if (stockState === 'in_stock') {
     const hasRealUnits = typeof stockUnits === 'number' && stockUnits > 1;
@@ -34,10 +30,6 @@ export function StockBadge({ stockState, stockUnits }) {
   );
 }
 
-/**
- * Status Badge for last scrape attempt:
- * success (green), retried (amber), failed (red).
- */
 export function StatusBadge({ status }) {
   if (status === 'success') {
     return (
@@ -74,16 +66,12 @@ export function StatusBadge({ status }) {
   );
 }
 
-/**
- * Price Change Chip (success down / danger up / neutral none).
- * Shows percentage drop or increase vs previous good read.
- */
 export function PriceChangeChip({ changePct }) {
   if (changePct === null || changePct === undefined || isNaN(changePct) || changePct === 0) {
     return null;
   }
 
-  const isDrop = changePct < 0; // Price drop is good for buyer (success)
+  const isDrop = changePct < 0; 
   return (
     <span className={`px-2 py-0.5 rounded-md text-[13px] font-bold flex items-center gap-1 tabular-nums ${
       isDrop ? 'badge-success' : 'badge-danger'

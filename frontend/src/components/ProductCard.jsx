@@ -17,7 +17,6 @@ export default function ProductCard({ product, onRetrack, onUntrack, isRetrackin
 
   const isStale = Boolean(lastAttempt && lastAttempt.status === 'failed' && latestGood);
 
-  // Calculate discount % if MRP exists and is higher than current price
   let discountPct = null;
   if (mrp && currentPrice && mrp > currentPrice) {
     discountPct = Math.round(((mrp - currentPrice) / mrp) * 100);
@@ -37,7 +36,7 @@ export default function ProductCard({ product, onRetrack, onUntrack, isRetrackin
       className="glass-panel glass-panel-hover rounded-[12px] overflow-hidden flex flex-col justify-between group relative p-5 shadow-md cursor-pointer border border-border"
     >
       <div>
-        {/* Top Header Row: Category Icon + Badges */}
+        {}
         <div className="flex items-start justify-between gap-3 mb-4">
           <div className="w-10 h-10 rounded-xl badge-neutral bg-surface flex items-center justify-center text-accent group-hover:bg-surface-2 transition-colors flex-shrink-0">
             <CategoryIcon className="w-5 h-5 text-accent" />
@@ -49,7 +48,7 @@ export default function ProductCard({ product, onRetrack, onUntrack, isRetrackin
           </div>
         </div>
 
-        {/* Brand & SKU */}
+        {}
         <div className="flex items-center gap-2 text-[13px] font-medium text-text-muted mb-1.5">
           {product.brand && <span className="text-text font-semibold">{product.brand}</span>}
           {product.brand && product.sku && <span>•</span>}
@@ -57,12 +56,12 @@ export default function ProductCard({ product, onRetrack, onUntrack, isRetrackin
           {!product.brand && !product.sku && <span className="capitalize">{product.category || 'General'}</span>}
         </div>
 
-        {/* Product Title */}
+        {}
         <h3 className="font-bold text-text text-base line-clamp-2 leading-snug mb-3 group-hover:text-accent transition-colors">
           {product.name}
         </h3>
 
-        {/* Price Section */}
+        {}
         <div className="mb-4">
           <div className="flex items-baseline gap-2 flex-wrap">
             <span className={`text-[28px] font-extrabold tracking-tight tabular-nums ${isStale ? 'text-text-muted opacity-80' : 'text-text'}`}>
@@ -85,7 +84,7 @@ export default function ProductCard({ product, onRetrack, onUntrack, isRetrackin
           </div>
         </div>
 
-        {/* Stale Price Warning Banner */}
+        {}
         {isStale && (
           <div className="mb-3 px-3 py-1.5 rounded-lg badge-warning text-[13px] font-medium flex items-center gap-1.5">
             <AlertTriangle className="w-4 h-4 text-warning flex-shrink-0" />
@@ -93,7 +92,7 @@ export default function ProductCard({ product, onRetrack, onUntrack, isRetrackin
           </div>
         )}
 
-        {/* Overdue Warning Banner */}
+        {}
         {product.overdue && !isStale && (
           <div className="mb-3 px-3 py-1.5 rounded-lg badge-warning text-[13px] font-medium flex items-center gap-1.5">
             <Clock className="w-4 h-4 text-warning flex-shrink-0" />
@@ -102,7 +101,7 @@ export default function ProductCard({ product, onRetrack, onUntrack, isRetrackin
         )}
       </div>
 
-      {/* Footer Timestamp & Action Buttons */}
+      {}
       <div className="pt-3.5 border-t border-border flex items-center justify-between text-[13px] text-text-muted gap-2">
         <div 
           className="flex items-center gap-1.5 min-w-0"
@@ -115,7 +114,7 @@ export default function ProductCard({ product, onRetrack, onUntrack, isRetrackin
         </div>
 
         <div className="flex items-center gap-1.5 flex-shrink-0">
-          {/* Scrape now Button */}
+          {}
           {onRetrack && (
             <button
               onClick={(e) => {
@@ -132,7 +131,7 @@ export default function ProductCard({ product, onRetrack, onUntrack, isRetrackin
             </button>
           )}
 
-          {/* External Merchant Store Link */}
+          {}
           {extId && (
             <a
               href={`https://demo.inelabteamdev.com/product/${extId}`}
@@ -147,7 +146,7 @@ export default function ProductCard({ product, onRetrack, onUntrack, isRetrackin
             </a>
           )}
 
-          {/* Untrack Button (Danger on hover only) */}
+          {}
           {onUntrack && (
             <button
               onClick={(e) => {

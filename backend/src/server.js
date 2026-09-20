@@ -14,23 +14,19 @@ dotenv.config();
 const app = express();
 const port = process.env.PORT || 3000;
 
-// Enable CORS using FRONTEND_URL if provided, else allow all (for dev)
 const corsOptions = {
   origin: process.env.FRONTEND_URL || '*',
   optionsSuccessStatus: 200
 };
 app.use(cors(corsOptions));
 
-// JSON parsing middleware
 app.use(express.json());
 
-// Routes
 app.use('/health', healthRouter);
 app.use('/api/search', searchRouter);
-app.use('/api', productsRouter); // Handles /api/track and /api/products...
+app.use('/api', productsRouter); 
 app.use('/api/scrape', scrapeRouter);
 
-// Global error handler
 app.use((err, req, res, next) => {
   console.error('Unhandled Error:', err);
   
@@ -43,8 +39,7 @@ app.use((err, req, res, next) => {
 
 app.listen(port, async () => {
   console.log(`Backend server listening on port ${port}`);
-  
-  // Check if we already have catalog items
+
   const { count, error } = await supabase
     .from('catalog')
     .select('*', { count: 'exact', head: true });
@@ -55,11 +50,9 @@ app.listen(port, async () => {
   } else {
     console.log(`Catalog already has ${count} items. Skipping initial startup sync to prevent rate-limits.`);
   }
-  
-  // Schedule catalog sync every 24 hours
+
   setInterval(syncCatalog, 24 * 60 * 60 * 1000);
 
-  // Background Scrape Scheduler: Checks every 5 minutes for products due for background rescrape
   setTimeout(() => runScheduledScrapes(), 10000);
   setInterval(runScheduledScrapes, 5 * 60 * 1000);
 });

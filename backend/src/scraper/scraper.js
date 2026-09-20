@@ -1,8 +1,7 @@
 import crypto from 'crypto';
 
-// Replaces Playwright with direct reverse-engineered API requests
 const BASE_URL = 'https://demo.inelabteamdev.com';
-const LR = 'ine-mock-store-shared-k3y'; // Shared secret derived from frontend bundle
+const LR = 'ine-mock-store-shared-k3y'; 
 
 function sha256(input) {
   return crypto.createHash('sha256').update(input, 'utf8').digest('hex');
@@ -33,28 +32,21 @@ function decryptPrice(enc64, token) {
   return JSON.parse(dec.toString('utf8'));
 }
 
-/**
- * A tagged error that carries an HTTP status code.
- * Used to distinguish permanent failures (404) from transient ones (503, 500).
- */
 class ScraperError extends Error {
   constructor(message, httpStatus) {
     super(message);
     this.httpStatus = httpStatus;
   }
   get isTransient() {
-    // 500, 502, 503, 504 are server-side transient errors - always retry
+    
     return this.httpStatus >= 500;
   }
   get isPermanent() {
-    // 404 means the product simply doesn't exist
+    
     return this.httpStatus === 404;
   }
 }
 
-/**
- * Fetch with a timeout so we never hang indefinitely.
- */
 async function fetchWithTimeout(url, options = {}, timeoutMs = 15000) {
   const controller = new AbortController();
   const timer = setTimeout(() => controller.abort(), timeoutMs);
@@ -69,21 +61,15 @@ async function fetchWithTimeout(url, options = {}, timeoutMs = 15000) {
 let lastHtmlHash = null;
 let lastHtmlCheckTime = 0;
 
-/**
- * Bonus Feature: Store HTML Change Detection
- * Fetches the root HTML, strips dynamic content, and hashes it.
- * Flags a warning if the store's structure has changed since last check.
- */
 async function checkStoreHtmlChanges() {
   const now = Date.now();
-  if (now - lastHtmlCheckTime < 60 * 60 * 1000) return; // Only check once per hour
+  if (now - lastHtmlCheckTime < 60 * 60 * 1000) return; 
   lastHtmlCheckTime = now;
   try {
     const res = await fetchWithTimeout(BASE_URL, { method: 'GET' }, 5000);
     if (!res.ok) return;
     const html = await res.text();
-    
-    // Strip scripts, styles, and numbers to isolate just the structural DOM layout
+
     const structureOnly = html
       .replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, '')
       .replace(/<style\b[^<]*(?:(?!<\/style>)<[^<]*)*<\/style>/gi, '')
@@ -98,20 +84,14 @@ async function checkStoreHtmlChanges() {
     }
     lastHtmlHash = currentHash;
   } catch (err) {
-    // Fail silently, don't interrupt scraping
+    
   }
 }
 
-/**
- * Scrape a specific product by directly interacting with the backend API.
- * Bypasses the client-side anti-bot check completely by solving the
- * cryptographic challenge natively in Node.js.
- */
 export async function scrapeProduct(productUrlOrId) {
-  // Bonus: Check for structural HTML changes
+  
   await checkStoreHtmlChanges();
 
-  // Extract numeric ID from URL or use directly
   let productId = productUrlOrId;
   if (String(productUrlOrId).startsWith('http')) {
     const match = productUrlOrId.match(/\/product\/(\d+)/);
@@ -119,7 +99,6 @@ export async function scrapeProduct(productUrlOrId) {
   }
   productId = Number(productId);
 
-  // ── Step 1 & 2: Fetch product metadata and challenge concurrently ───────
   const [prodRes, cr] = await Promise.all([
     fetchWithTimeout(`${BASE_URL}/api/product/${productId}`),
     fetchWithTimeout(`${BASE_URL}/api/challenge`)
@@ -138,7 +117,6 @@ export async function scrapeProduct(productUrlOrId) {
   }
   const challenge = await cr.json();
 
-  // ── Step 3: Build a synthetic but mathematically valid fingerprint ────────
   const now = Date.now();
   const snapshotIx = {
     hoverAt: now - 1200,
@@ -149,7 +127,7 @@ export async function scrapeProduct(productUrlOrId) {
       [180, 230, now - 600],  [185, 235, now - 500]
     ],
     clickAt: now,
-    trusted: true   // crucial – server rejects untrusted events
+    trusted: true   
   };
 
   const fingerprintObj = {
@@ -167,13 +145,11 @@ export async function scrapeProduct(productUrlOrId) {
   const fingerprintJSON = JSON.stringify(fingerprintObj);
   const fpHash = sha256(fingerprintJSON);
 
-  // ── Step 4: Cryptographic proof computation ───────────────────────────────
   const wasmSeed = parseInt(sha256(LR + '|seed|' + challenge.salt + '|' + fpHash).slice(0, 8), 16) | 0;
   const wasmOut  = await runWasm(challenge.wasm, wasmSeed);
   const nonce    = solvePoW(challenge.salt, challenge.difficulty);
   const derived  = sha256(LR + '|derive|' + challenge.salt + '|' + (wasmOut | 0) + '|' + fpHash);
 
-  // ── Step 5: Exchange proof for a session token ────────────────────────────
   const sessionBody = { ...challenge, nonce, derived, wasmOut, att: fingerprintJSON, productId };
   const sr = await fetchWithTimeout(`${BASE_URL}/api/session`, {
     method: 'POST',
@@ -188,7 +164,6 @@ export async function scrapeProduct(productUrlOrId) {
 
   const { token } = await sr.json();
 
-  // ── Step 6: Fetch the encrypted price payload ─────────────────────────────
   const pr = await fetchWithTimeout(`${BASE_URL}/api/products/${productId}/price`, {
     headers: { 'Authorization': `Bearer ${token}` }
   });
@@ -200,11 +175,8 @@ export async function scrapeProduct(productUrlOrId) {
 
   const prData = await pr.json();
 
-  // ── Step 7: Decrypt the XOR-encrypted price JSON ──────────────────────────
   const decrypted = decryptPrice(prData.e, token);
 
-  // ── Step 8: Normalise into a standard result object ───────────────────────
-  // The shown price is always `p`. Fallback chain: p → n (sale) → m (MRP).
   const priceVal = decrypted.p ?? decrypted.n ?? decrypted.m;
   const numPrice = typeof priceVal === 'number' ? priceVal : parseFloat(String(priceVal).replace(/[^0-9.]/g, ''));
   const mrpVal = decrypted.m != null ? (typeof decrypted.m === 'number' ? decrypted.m : parseFloat(String(decrypted.m))) : null;
@@ -233,7 +205,6 @@ export async function scrapeProduct(productUrlOrId) {
     delivery_days: decrypted.d ?? null
   };
 }
-
 
 class RequestQueue {
   constructor(concurrency, delayMs) {
@@ -272,12 +243,8 @@ class RequestQueue {
   }
 }
 
-// Global queue: Max 1 concurrent scrape, with 1500ms delay to perfectly respect strict rate limits
 const globalScrapeQueue = new RequestQueue(1, 1500);
 
-/**
- * Core scraping logic wrapped with smart retry.
- */
 async function _scrapeWithRetryCore(product) {
   const MAX_ATTEMPTS = 5;
   let lastError = null;
@@ -295,14 +262,12 @@ async function _scrapeWithRetryCore(product) {
     } catch (err) {
       lastError = err;
 
-      // Never retry permanent errors
       if (err instanceof ScraperError && err.isPermanent) {
         break;
       }
 
-      // If we have more attempts left, wait with exponential backoff
       if (attempt < MAX_ATTEMPTS) {
-        // 500ms, 1s, 2s, 4s between attempts
+        
         const delay = Math.min(500 * Math.pow(2, attempt - 1), 4000);
         await new Promise(resolve => setTimeout(resolve, delay));
       }
@@ -318,16 +283,10 @@ async function _scrapeWithRetryCore(product) {
   };
 }
 
-/**
- * Wraps _scrapeWithRetryCore in a global queue to strictly prevent 429 errors from bulk requests.
- */
 export async function scrapeWithRetry(product, priority = false) {
   return globalScrapeQueue.enqueue(() => _scrapeWithRetryCore(product), priority);
 }
 
-/**
- * Retained for backwards compatibility (no-op: no browser to close).
- */
 export async function closeScraper() {
   return Promise.resolve();
 }

@@ -10,19 +10,17 @@ export default function Search() {
   const [query, setQuery] = useState('');
   const [debouncedQuery, setDebouncedQuery] = useState('');
   const [results, setResults] = useState([]);
-  const [trackedMap, setTrackedMap] = useState(new Map()); // Maps external_id/id to product_id
+  const [trackedMap, setTrackedMap] = useState(new Map()); 
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [trackingId, setTrackingId] = useState(null);
   const [toastMessage, setToastMessage] = useState(null);
 
-  // Category filter state & pagination
   const [selectedCategory, setSelectedCategory] = useState('All');
   const [displayCount, setDisplayCount] = useState(12);
 
   const navigate = useNavigate();
 
-  // Load existing tracked products to calculate "Tracked" state
   const loadTrackedProducts = async () => {
     try {
       const tracked = await getProducts();
@@ -42,7 +40,6 @@ export default function Search() {
     loadTrackedProducts();
   }, []);
 
-  // 300ms Debounce search input
   useEffect(() => {
     const timer = setTimeout(() => {
       setDebouncedQuery(query);
@@ -50,7 +47,6 @@ export default function Search() {
     return () => clearTimeout(timer);
   }, [query]);
 
-  // Execute search when debounced query changes
   useEffect(() => {
     if (!debouncedQuery.trim()) {
       setResults([]);
@@ -78,7 +74,6 @@ export default function Search() {
     return () => controller.abort();
   }, [debouncedQuery]);
 
-  // Handle tracking a search result item
   const handleTrackItem = async (product) => {
     setTrackingId(product.id);
     try {
@@ -111,7 +106,6 @@ export default function Search() {
     }
   };
 
-  // Extract real categories from search results
   const availableCategories = useMemo(() => {
     const categories = new Set(['All']);
     results.forEach(r => {
@@ -120,7 +114,6 @@ export default function Search() {
     return Array.from(categories);
   }, [results]);
 
-  // Filter results by category
   const filteredResults = useMemo(() => {
     if (selectedCategory === 'All') return results;
     return results.filter(r => r.category === selectedCategory);
@@ -130,7 +123,7 @@ export default function Search() {
 
   return (
     <div className="flex flex-col w-full max-w-6xl mx-auto">
-      {/* Toast Feedback Banner */}
+      {}
       <AnimatePresence>
         {toastMessage && (
           <motion.div
@@ -145,7 +138,7 @@ export default function Search() {
         )}
       </AnimatePresence>
 
-      {/* Header */}
+      {}
       <div className="text-center mb-8">
         <h1 className="text-3xl md:text-4xl font-extrabold text-text tracking-tight mb-3">
           Discover & <span className="text-accent">Track Catalog Items</span>
@@ -155,7 +148,7 @@ export default function Search() {
         </p>
       </div>
 
-      {/* Single Main Search Bar */}
+      {}
       <div className="relative max-w-3xl mx-auto w-full mb-8">
         <div className="glass-panel rounded-[12px] p-2 flex items-center border border-border shadow-lg">
           <div className="pl-4 pr-3 text-text-muted">
@@ -176,7 +169,7 @@ export default function Search() {
         </div>
       </div>
 
-      {/* Category Filter Chips & Result Counter */}
+      {}
       {results.length > 0 && (
         <div className="flex flex-col sm:flex-row items-center justify-between gap-4 mb-6">
           <div className="flex items-center gap-2 overflow-x-auto w-full sm:w-auto pb-2 pr-2 pl-1 pt-1 scrollbar-none">
@@ -201,12 +194,12 @@ export default function Search() {
         </div>
       )}
 
-      {/* Error State */}
+      {}
       {error ? (
         <ErrorState error={error} onRetry={() => setDebouncedQuery(query)} />
       ) : results.length > 0 ? (
         <>
-          {/* Results Grid */}
+          {}
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 mb-8">
             {visibleResults.map((product) => {
               const CategoryIcon = getCategoryIcon(product.category);
@@ -224,7 +217,7 @@ export default function Search() {
                   className="glass-panel p-5 rounded-[12px] flex flex-col justify-between border border-border shadow-md"
                 >
                   <div>
-                    {/* Top Row: Category Icon & SKU */}
+                    {}
                     <div className="flex items-center justify-between gap-2 mb-4">
                       <div className="w-10 h-10 rounded-xl bg-surface-2 border border-border flex items-center justify-center text-accent">
                         <CategoryIcon className="w-5 h-5 text-accent" />
@@ -234,20 +227,20 @@ export default function Search() {
                       </span>
                     </div>
 
-                    {/* Brand Badge */}
+                    {}
                     {product.brand && (
                       <span className="text-[13px] font-semibold text-accent uppercase tracking-wider block mb-1">
                         {product.brand}
                       </span>
                     )}
 
-                    {/* Name */}
+                    {}
                     <h3 className="font-bold text-text text-base leading-snug line-clamp-2 mb-4">
                       {product.name}
                     </h3>
                   </div>
 
-                  {/* Track / Tracked Button */}
+                  {}
                   <div className="pt-3 border-t border-border">
                     {isTracked ? (
                       <div className="flex items-center gap-2">
@@ -286,7 +279,7 @@ export default function Search() {
             })}
           </div>
 
-          {/* Load More Pagination */}
+          {}
           {displayCount < filteredResults.length && (
             <div className="flex justify-center mb-12">
               <button
@@ -306,7 +299,7 @@ export default function Search() {
           </p>
         </div>
       ) : (
-        /* Default / Initial Search State */
+        
         <div className="glass-panel p-10 rounded-[12px] text-center border border-border my-4 max-w-2xl mx-auto">
           <div className="w-16 h-16 rounded-2xl badge-accent flex items-center justify-center mx-auto mb-4">
             <SearchIcon className="w-8 h-8 text-accent" />

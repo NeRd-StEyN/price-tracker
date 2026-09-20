@@ -24,21 +24,17 @@ export default function ProductDetail() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  // Controls & Action states
   const [scraping, setScraping] = useState(false);
   const [scrapeResultInline, setScrapeResultInline] = useState(null);
   const [updatingInterval, setUpdatingInterval] = useState(false);
   const [untracking, setUntracking] = useState(false);
 
-  // Chart range filter
-  const [chartRange, setChartRange] = useState('7d'); // '24h' | '7d' | '30d' | 'all'
+  const [chartRange, setChartRange] = useState('7d'); 
 
-  // Log filter & Expandable row state
   const [logStatusFilter, setLogStatusFilter] = useState('');
   const [expandedLogId, setExpandedLogId] = useState(null);
 
-  // Active Tab
-  const [activeTab, setActiveTab] = useState('history'); // 'history' | 'logs' | 'specs'
+  const [activeTab, setActiveTab] = useState('history'); 
 
   const fetchData = async () => {
     try {
@@ -64,7 +60,6 @@ export default function ProductDetail() {
     fetchData();
   }, [id, chartRange, logStatusFilter]);
 
-  // Handle Manual Scrape / Retrack
   const handleScrapeNow = async () => {
     setScraping(true);
     setScrapeResultInline(null);
@@ -79,7 +74,6 @@ export default function ProductDetail() {
     }
   };
 
-  // Handle Interval Change
   const handleIntervalChange = async (e) => {
     const val = Number(e.target.value);
     setUpdatingInterval(true);
@@ -93,7 +87,6 @@ export default function ProductDetail() {
     }
   };
 
-  // Handle Untrack
   const handleUntrack = async () => {
     if (!window.confirm(`Are you sure you want to stop tracking "${product?.name}"?`)) return;
     setUntracking(true);
@@ -117,13 +110,11 @@ export default function ProductDetail() {
 
   const isStale = Boolean(lastAttempt && lastAttempt.status === 'failed' && latestGood);
 
-  // Calculate discount percentage if MRP exists
   let discountPct = null;
   if (latestGood?.mrp && latestGood?.price && latestGood.mrp > latestGood.price) {
     discountPct = Math.round(((latestGood.mrp - latestGood.price) / latestGood.mrp) * 100);
   }
 
-  // Format Recharts data for Price Trajectory (good reads only, oldest first)
   const chartData = history.map(h => ({
     time: new Date(h.scraped_at).toLocaleString('en-IN', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' }),
     price: parseFloat(h.price),
@@ -132,12 +123,11 @@ export default function ProductDetail() {
     scrapedAt: h.scraped_at
   }));
 
-  // Identify out-of-stock data points on chart
   const outOfStockPoints = chartData.filter(d => !d.inStock);
 
   return (
     <div className="flex flex-col w-full max-w-7xl mx-auto">
-      {/* Back Button */}
+      {}
       <button 
         onClick={() => navigate(-1)} 
         className="flex items-center gap-2 text-text-muted hover:text-text mb-6 w-fit transition-colors text-sm font-semibold focus-visible:ring-2 focus-visible:ring-accent focus-visible:outline-none rounded-lg p-1"
@@ -146,7 +136,7 @@ export default function ProductDetail() {
         <span>Back to Dashboard</span>
       </button>
 
-      {/* Warning Banner if Last Attempt Failed */}
+      {}
       {lastAttempt && lastAttempt.status === 'failed' && (
         <motion.div 
           initial={{ opacity: 0, y: -10 }}
@@ -177,7 +167,7 @@ export default function ProductDetail() {
         </motion.div>
       )}
 
-      {/* Inline Scrape Result Notification */}
+      {}
       <AnimatePresence>
         {scrapeResultInline && (
           <motion.div
@@ -198,10 +188,10 @@ export default function ProductDetail() {
         )}
       </AnimatePresence>
 
-      {/* Hero Product Overview */}
+      {}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 mb-8">
         
-        {/* Left Card: Category Icon & Metadata */}
+        {}
         <div className="lg:col-span-4 glass-panel p-6 rounded-[12px] flex flex-col justify-between border border-border relative overflow-hidden">
           <div>
             <div className="flex items-center justify-between gap-3 mb-6">
@@ -213,13 +203,13 @@ export default function ProductDetail() {
               <StockBadge stockState={product.stock_state} stockUnits={latestGood?.stock_units} />
             </div>
 
-            {/* Category Icon Container */}
+            {}
             <div className="w-full aspect-video bg-surface-2 rounded-xl flex flex-col items-center justify-center p-6 border border-border mb-6 shadow-inner">
               <CategoryIcon className="w-16 h-16 text-accent mb-2" />
               <span className="text-xs font-semibold text-text-muted uppercase tracking-widest">{product.category || 'General'}</span>
             </div>
 
-            {/* Description */}
+            {}
             {product.description && (
               <p className="text-xs text-text-muted leading-relaxed mb-6 font-normal">
                 {product.description}
@@ -227,7 +217,7 @@ export default function ProductDetail() {
             )}
           </div>
 
-          {/* External Store Link Button */}
+          {}
           <a 
             href={`https://demo.inelabteamdev.com/product/${extId}`}
             target="_blank" 
@@ -241,10 +231,10 @@ export default function ProductDetail() {
           </a>
         </div>
 
-        {/* Right Card: Price Panel & Metadata Grid */}
+        {}
         <div className="lg:col-span-8 flex flex-col justify-between glass-panel p-8 rounded-[12px] border border-border relative overflow-hidden">
           <div className="relative z-10">
-            {/* Brand & Category */}
+            {}
             <div className="flex items-center gap-3 mb-3">
               {product.brand && (
                 <span className="text-xs font-extrabold uppercase tracking-widest badge-accent px-3 py-1 rounded-md">
@@ -254,12 +244,12 @@ export default function ProductDetail() {
               <StatusBadge status={lastAttempt?.status} />
             </div>
 
-            {/* Title */}
+            {}
             <h1 className="text-3xl lg:text-4xl font-extrabold text-text tracking-tight leading-snug mb-6">
               {product.name}
             </h1>
 
-            {/* Price Cards Grid */}
+            {}
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
               <div className="bg-surface-2 border border-border p-5 rounded-xl">
                 <span className="text-xs text-text-muted font-semibold uppercase tracking-wider mb-1 block">Current Price</span>
@@ -299,7 +289,7 @@ export default function ProductDetail() {
               </div>
             </div>
 
-            {/* Merchant Store Telemetry Metadata */}
+            {}
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 p-4 rounded-xl bg-surface-2/60 border border-border mb-6 text-xs">
               <div>
                 <span className="text-text-muted block mb-0.5">Rating</span>
@@ -329,7 +319,7 @@ export default function ProductDetail() {
             </div>
           </div>
 
-          {/* Action Toolbar: Scrape Now, Interval Select, Untrack */}
+          {}
           <div className="pt-6 border-t border-border flex flex-wrap items-center justify-between gap-4 relative z-10">
             <div className="flex items-center gap-3">
               <button
@@ -343,7 +333,7 @@ export default function ProductDetail() {
                 <span>{scraping ? 'Scraping...' : 'Scrape now'}</span>
               </button>
 
-              {/* Interval Select */}
+              {}
               <div className="flex items-center gap-1.5 text-xs text-text-muted">
                 <Clock className="w-3.5 h-3.5 text-text-muted" />
                 <span>Interval:</span>
@@ -376,7 +366,7 @@ export default function ProductDetail() {
         </div>
       </div>
 
-      {/* Price Analytics Trajectory Chart */}
+      {}
       <div className="glass-panel p-8 rounded-[12px] mb-8 border border-border">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
           <div>
@@ -384,7 +374,7 @@ export default function ProductDetail() {
             <p className="text-xs text-text-muted">Historical pricing trajectory (Good reads only)</p>
           </div>
 
-          {/* Range Tabs */}
+          {}
           <div className="flex items-center gap-1 bg-surface-2 p-1 rounded-xl border border-border">
             {['24h', '7d', '30d', 'all'].map(r => (
               <button
@@ -426,7 +416,7 @@ export default function ProductDetail() {
                 />
                 <Area type="monotone" dataKey="price" stroke="#000000" strokeWidth={2} fillOpacity={1} fill="url(#colorPrice)" activeDot={{ r: 6, fill: '#000000', stroke: '#FFFFFF', strokeWidth: 2 }} />
 
-                {/* Markers where stock hit 0 */}
+                {}
                 {outOfStockPoints.map((pt, idx) => (
                   <ReferenceDot 
                     key={idx} 
@@ -449,7 +439,7 @@ export default function ProductDetail() {
         )}
       </div>
 
-      {/* Detail Tabs: Price & Stock History | Scrape Log | Technical Specs */}
+      {}
       <div className="glass-panel p-6 rounded-[12px] border border-border">
         <div className="flex items-center gap-4 border-b border-border pb-4 mb-6">
           <button
@@ -480,7 +470,7 @@ export default function ProductDetail() {
           )}
         </div>
 
-        {/* TAB 1: Price & Stock History Table */}
+        {}
         {activeTab === 'history' && (
           <div className="overflow-x-auto">
             <table className="w-full text-left text-xs border-collapse">
@@ -517,10 +507,10 @@ export default function ProductDetail() {
           </div>
         )}
 
-        {/* TAB 2: Scrape Log Table with Filter & Expandable Technical Row */}
+        {}
         {activeTab === 'logs' && (
           <div>
-            {/* Status Filter */}
+            {}
             <div className="flex items-center gap-2 mb-4">
               <span className="text-xs text-text-muted font-medium">Filter Log Status:</span>
               {['', 'success', 'retried', 'failed'].map(st => (
@@ -578,7 +568,7 @@ export default function ProductDetail() {
                           </td>
                         </tr>
 
-                        {/* Expandable Technical Details Row */}
+                        {}
                         {isExpanded && (
                           <tr className="bg-surface-2">
                             <td colSpan={6} className="p-4 border-b border-border">
@@ -607,7 +597,7 @@ export default function ProductDetail() {
           </div>
         )}
 
-        {/* TAB 3: Technical Specs */}
+        {}
         {activeTab === 'specs' && product.specs && (
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {Object.entries(product.specs).map(([key, value]) => (

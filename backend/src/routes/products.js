@@ -5,7 +5,6 @@ import { invalidateSearchCache } from './search.js';
 
 const router = Router();
 
-// In-memory rate limiter map for POST /api/products/:id/scrape (30s per product)
 const scrapeRateLimitMap = new Map();
 
 function mapErrorCode(status, message) {
@@ -122,14 +121,10 @@ function formatProduct(product, historyList = [], logsList = []) {
   };
 }
 
-// -------------------------------------------------------------------
-// 1. GET /api/stats -> Summary metrics
-// -------------------------------------------------------------------
 router.get('/stats', async (req, res, next) => {
   try {
     const sevenDaysAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString();
-    
-    // Parallelize both independent database queries
+
     const [
       { data: products, error: pErr },
       { data: logs7d, error: lErr }
@@ -186,9 +181,6 @@ router.get('/stats', async (req, res, next) => {
   }
 });
 
-// -------------------------------------------------------------------
-// 2. GET /api/products -> All tracked products formatted strictly
-// -------------------------------------------------------------------
 router.get('/products', async (req, res, next) => {
   try {
     const { data, error } = await supabase
@@ -212,16 +204,11 @@ router.get('/products', async (req, res, next) => {
   }
 });
 
-// -------------------------------------------------------------------
-// 3. GET / POST /api/products/scrape-all -> Rescrape all tracked products
-// MUST BE REGISTERED BEFORE /products/:id to prevent Express path collision!
-// -------------------------------------------------------------------
 router.all('/products/scrape-all', async (req, res, next) => {
   try {
     const { data: products, error } = await supabase.from('products').select('*');
     if (error) throw new Error(`Database error: ${error.message}`);
 
-    // Fire and forget scraping to avoid HTTP timeouts and "Server warming up" warnings
     Promise.allSettled(products.map(async (product) => {
       const startTime = Date.now();
       const scrapeResult = await scrapeWithRetry(product.external_id);
@@ -252,9 +239,6 @@ router.all('/products/scrape-all', async (req, res, next) => {
   }
 });
 
-// -------------------------------------------------------------------
-// 4. GET /api/products/:id -> Single product full details
-// -------------------------------------------------------------------
 router.get('/products/:id', async (req, res, next) => {
   try {
     const { data: p, error } = await supabase
@@ -297,9 +281,6 @@ router.get('/products/:id', async (req, res, next) => {
   }
 });
 
-// -------------------------------------------------------------------
-// 5. GET /api/products/:id/history?range=24h|7d|30d|all
-// -------------------------------------------------------------------
 router.get('/products/:id/history', async (req, res, next) => {
   try {
     const { range } = req.query;
@@ -330,9 +311,6 @@ router.get('/products/:id/history', async (req, res, next) => {
   }
 });
 
-// -------------------------------------------------------------------
-// 6. GET /api/products/:id/logs?limit=50&status=...
-// -------------------------------------------------------------------
 router.get('/products/:id/logs', async (req, res, next) => {
   try {
     const limit = parseInt(req.query.limit) || 50;
@@ -363,9 +341,6 @@ router.get('/products/:id/logs', async (req, res, next) => {
   }
 });
 
-// -------------------------------------------------------------------
-// 7. POST /api/products/:id/scrape -> Single rescrape (Rate-limit 1/30s)
-// -------------------------------------------------------------------
 router.post('/products/:id/scrape', async (req, res, next) => {
   try {
     const productId = req.params.id;
@@ -435,9 +410,6 @@ router.post('/products/:id/scrape', async (req, res, next) => {
   }
 });
 
-// -------------------------------------------------------------------
-// 8. PATCH /api/products/:id { scrape_interval_minutes }
-// -------------------------------------------------------------------
 router.patch('/products/:id', async (req, res, next) => {
   try {
     const { scrape_interval_minutes } = req.body;
@@ -463,9 +435,6 @@ router.patch('/products/:id', async (req, res, next) => {
   }
 });
 
-// -------------------------------------------------------------------
-// 9. POST /api/track -> Track product
-// -------------------------------------------------------------------
 router.post('/track', async (req, res, next) => {
   try {
     const { name, url, external_id, image_url } = req.body;
@@ -521,7 +490,6 @@ router.post('/track', async (req, res, next) => {
       }
     })();
 
-    // Invalidate search cache so new product appears immediately in search results
     await invalidateSearchCache();
 
     res.status(201).json({
@@ -535,9 +503,6 @@ router.post('/track', async (req, res, next) => {
   }
 });
 
-// -------------------------------------------------------------------
-// 10. DELETE /api/products -> Untrack all
-// -------------------------------------------------------------------
 router.delete('/products', async (req, res, next) => {
   try {
     const { error } = await supabase
@@ -547,7 +512,6 @@ router.delete('/products', async (req, res, next) => {
 
     if (error) throw new Error(`Database error: ${error.message}`);
 
-    // Invalidate search cache so deleted products disappear from results immediately
     await invalidateSearchCache();
 
     res.json({ ok: true, message: 'All products untracked' });
@@ -556,9 +520,6 @@ router.delete('/products', async (req, res, next) => {
   }
 });
 
-// -------------------------------------------------------------------
-// 11. DELETE /api/products/:id -> Untrack single product
-// -------------------------------------------------------------------
 router.delete('/products/:id', async (req, res, next) => {
   try {
     const { error } = await supabase
@@ -568,7 +529,6 @@ router.delete('/products/:id', async (req, res, next) => {
 
     if (error) throw new Error(`Database error: ${error.message}`);
 
-    // Invalidate search cache so deleted product disappears from results immediately
     await invalidateSearchCache();
 
     res.json({ ok: true, message: 'Product untracked' });

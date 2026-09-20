@@ -1,10 +1,6 @@
 import React from 'react';
 import { Headphones, Monitor, Laptop, Keyboard, Watch, Package, Server, ShieldAlert, Clock, AlertTriangle, FileSearch } from 'lucide-react';
 
-/**
- * Format currency values in INR (Indian Rupee) with zero decimal places.
- * Example: 8059 -> "₹8,059"
- */
 export function formatPrice(amount) {
   if (amount === null || amount === undefined || isNaN(Number(amount))) {
     return 'N/A';
@@ -16,9 +12,6 @@ export function formatPrice(amount) {
   }).format(amount);
 }
 
-/**
- * Format relative time (e.g., "14h ago", "2m ago", "just now").
- */
 export function formatRelativeTime(dateString) {
   if (!dateString) return 'Never';
   const date = new Date(dateString);
@@ -40,9 +33,6 @@ export function formatRelativeTime(dateString) {
   return date.toLocaleDateString('en-IN', { month: 'short', day: 'numeric' });
 }
 
-/**
- * Format exact timestamp for native tooltip on hover (e.g. title attribute).
- */
 export function formatExactTime(dateString) {
   if (!dateString) return 'No timestamp';
   return new Date(dateString).toLocaleString('en-IN', {
@@ -51,10 +41,6 @@ export function formatExactTime(dateString) {
   });
 }
 
-/**
- * Map real category names to distinct Lucide icons.
- * Never use fake or broken image placeholders.
- */
 export function getCategoryIcon(category) {
   const cat = String(category || '').toLowerCase();
   if (cat.includes('audio') || cat.includes('headphone') || cat.includes('earbud')) return Headphones;
@@ -65,10 +51,6 @@ export function getCategoryIcon(category) {
   return Package;
 }
 
-/**
- * Map raw technical scraper error codes/messages to user-friendly text.
- * Technical trace details are rendered in an expandable detail row.
- */
 export function mapErrorToFriendlyText(errorCode, rawMessage) {
   const code = (errorCode || '').toUpperCase();
   const msg = (rawMessage || '').toUpperCase();
