@@ -2,25 +2,48 @@
 @tailwind components;
 @tailwind utilities;
 
+:root {
+  --bg: #0B0F14;
+  --surface: #111820;
+  --surface-2: #16202B;
+  --border: #223040;
+  --text: #E6EDF3;
+  --text-muted: #9AA7B4;
+  --accent: #5B8DEF;
+  --success: #34D399;
+  --warning: #FBBF24;
+  --danger: #F87171;
+  --neutral: #94A3B8;
+
+  --accent-bg: rgba(91, 141, 239, 0.12);
+  --accent-border: rgba(91, 141, 239, 0.30);
+  --success-bg: rgba(52, 211, 153, 0.12);
+  --success-border: rgba(52, 211, 153, 0.30);
+  --warning-bg: rgba(251, 191, 36, 0.12);
+  --warning-border: rgba(251, 191, 36, 0.30);
+  --danger-bg: rgba(248, 113, 113, 0.12);
+  --danger-border: rgba(248, 113, 113, 0.30);
+  --neutral-bg: rgba(148, 163, 184, 0.12);
+  --neutral-border: rgba(148, 163, 184, 0.30);
+}
+
 @layer base {
   html, body { 
     margin: 0; 
     padding: 0; 
-    color: #F3F4F6;
+    color: var(--text);
     font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
-    background-color: #0A0A0A;
+    background-color: var(--bg);
   } 
 }
 
 body { 
   overscroll-behavior: none; 
-  background-color: #0A0A0A !important;
+  background-color: var(--bg) !important;
   background-image: 
-    radial-gradient(at 15% 15%, rgba(244, 63, 94, 0.10) 0px, transparent 50%),
-    radial-gradient(at 85% 20%, rgba(251, 113, 133, 0.07) 0px, transparent 50%),
-    radial-gradient(at 50% 80%, rgba(244, 63, 94, 0.04) 0px, transparent 60%);
+    radial-gradient(at 50% 0%, rgba(91, 141, 239, 0.06) 0px, transparent 60%);
   background-attachment: fixed;
   min-height: 100vh;
 }
@@ -32,46 +55,82 @@ body {
 }
 
 ::-webkit-scrollbar-track {
-  background: #0A0A0A;
+  background: var(--bg);
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #1C1C1C;
+  background: var(--surface-2);
   border-radius: 4px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #2A2A2A;
+  background: var(--border);
 }
 
-/* Glassmorphism Panel Utilities */
+/* Glassmorphism / Card Panel Utilities */
 .glass-panel {
-  background: rgba(12, 12, 12, 0.80) !important;
+  background: var(--surface) !important;
   backdrop-filter: blur(16px) saturate(180%) !important;
   -webkit-backdrop-filter: blur(16px) saturate(180%) !important;
-  border: 1px solid rgba(255, 255, 255, 0.06) !important;
-  box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.7) !important;
+  border: 1px solid var(--border) !important;
+  box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.5) !important;
 }
 
 .glass-panel-hover {
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+  transition: all 0.2s ease-in-out !important;
 }
 
 .glass-panel-hover:hover {
-  background: rgba(18, 18, 18, 0.92) !important;
-  border-color: rgba(244, 63, 94, 0.25) !important;
-  transform: translateY(-4px) !important;
-  box-shadow: 0 20px 40px -15px rgba(244, 63, 94, 0.12), 0 0 20px rgba(244, 63, 94, 0.04) !important;
+  background: var(--surface-2) !important;
+  border-color: rgba(91, 141, 239, 0.3) !important;
+  transform: translateY(-2px) !important;
+  box-shadow: 0 16px 36px -12px rgba(0, 0, 0, 0.6) !important;
 }
 
 .glass-input {
-  background: rgba(12, 12, 12, 0.65) !important;
-  backdrop-filter: blur(12px) !important;
-  -webkit-backdrop-filter: blur(12px) !important;
-  border: 1px solid rgba(255, 255, 255, 0.08) !important;
+  background: var(--surface) !important;
+  border: 1px solid var(--border) !important;
+  color: var(--text) !important;
 }
 
-.glass-input:focus-within {
-  border-color: rgba(244, 63, 94, 0.45) !important;
-  box-shadow: 0 0 20px rgba(244, 63, 94, 0.15) !important;
+.glass-input:focus-within,
+.glass-input:focus {
+  border-color: var(--accent) !important;
+  box-shadow: 0 0 0 2px rgba(91, 141, 239, 0.2) !important;
+}
+
+/* Badge Utilities */
+.badge-success {
+  background-color: var(--success-bg);
+  border: 1px solid var(--success-border);
+  color: var(--success);
+}
+
+.badge-warning {
+  background-color: var(--warning-bg);
+  border: 1px solid var(--warning-border);
+  color: var(--warning);
+}
+
+.badge-danger {
+  background-color: var(--danger-bg);
+  border: 1px solid var(--danger-border);
+  color: var(--danger);
+}
+
+.badge-neutral {
+  background-color: var(--neutral-bg);
+  border: 1px solid var(--neutral-border);
+  color: var(--neutral);
+}
+
+.badge-accent {
+  background-color: var(--accent-bg);
+  border: 1px solid var(--accent-border);
+  color: var(--accent);
+}
+
+/* Tabular Numerals utility */
+.tabular-nums {
+  font-variant-numeric: tabular-nums;
 }

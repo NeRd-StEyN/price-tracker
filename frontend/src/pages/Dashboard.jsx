@@ -12,19 +12,19 @@ import {
 import { LoadingSkeleton, ErrorState, EmptyState } from '../components/StateComponents';
 import ProductCard from '../components/ProductCard';
 
-const StatCard = ({ title, value, subtext, icon: Icon, colorClass, delay = 0 }) => (
+const StatCard = ({ title, value, subtext, icon: Icon, badgeClass = 'badge-neutral', delay = 0 }) => (
   <motion.div 
     initial={{ opacity: 0, y: 15 }}
     animate={{ opacity: 1, y: 0 }}
     transition={{ delay, duration: 0.3 }}
-    className="glass-panel p-5 rounded-2xl flex items-center justify-between border border-white/10 relative overflow-hidden group shadow-lg"
+    className="glass-panel p-5 rounded-[12px] flex items-center justify-between border border-border relative overflow-hidden group shadow-md"
   >
     <div>
-      <p className="text-xs text-slate-400 font-semibold uppercase tracking-wider mb-1">{title}</p>
-      <h3 className="text-3xl font-extrabold text-white tracking-tight">{value}</h3>
-      {subtext && <p className="text-[11px] text-slate-400 mt-1 font-medium">{subtext}</p>}
+      <p className="text-xs text-text-muted font-semibold uppercase tracking-wider mb-1">{title}</p>
+      <h3 className="text-3xl font-extrabold text-text tracking-tight tabular-nums">{value}</h3>
+      {subtext && <p className="text-[13px] text-text-muted mt-1 font-medium">{subtext}</p>}
     </div>
-    <div className={`w-12 h-12 rounded-xl flex items-center justify-center border ${colorClass} transition-transform duration-300 group-hover:scale-105`}>
+    <div className={`w-12 h-12 rounded-xl flex items-center justify-center ${badgeClass} transition-transform duration-300 group-hover:scale-105 flex-shrink-0`}>
       <Icon className="w-6 h-6" />
     </div>
   </motion.div>
@@ -78,7 +78,7 @@ export default function Dashboard() {
     return () => clearInterval(intervalId);
   }, []);
 
-  // Single Retrack Handler
+  // Single Scrape / Retrack Handler
   const handleRetrackSingle = async (productId) => {
     setRetrackingIds(prev => new Set(prev).add(productId));
     try {
@@ -86,7 +86,7 @@ export default function Dashboard() {
       showToast('Product rescraped successfully');
       await loadData(false);
     } catch (err) {
-      showToast(`Retrack failed: ${err.message}`);
+      showToast(`Scrape failed: ${err.message}`);
     } finally {
       setRetrackingIds(prev => {
         const next = new Set(prev);
@@ -115,10 +115,10 @@ export default function Dashboard() {
     setRetrackingAll(true);
     try {
       await retrackAllProducts();
-      showToast('Retrack requested for all products');
+      showToast('Scrape requested for all products');
       await loadData(false);
     } catch (err) {
-      showToast(`Retrack All failed: ${err.message}`);
+      showToast(`Scrape All failed: ${err.message}`);
     } finally {
       setRetrackingAll(false);
     }
@@ -212,9 +212,9 @@ export default function Dashboard() {
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
           exit={{ opacity: 0, y: -20 }}
-          className="fixed top-20 right-6 z-50 px-4 py-3 rounded-xl bg-slate-900 border border-rose-500/40 text-rose-300 text-xs font-semibold shadow-2xl backdrop-blur-xl flex items-center gap-2"
+          className="fixed top-20 right-6 z-50 px-4 py-3 rounded-xl badge-accent text-[13px] font-semibold shadow-xl backdrop-blur-xl flex items-center gap-2"
         >
-          <div className="w-2 h-2 rounded-full bg-rose-400 animate-pulse" />
+          <div className="w-2 h-2 rounded-full bg-accent animate-pulse" />
           <span>{toastMessage}</span>
         </motion.div>
       )}
@@ -222,41 +222,44 @@ export default function Dashboard() {
       {/* Page Header */}
       <div className="mb-6 flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
-          <h1 className="text-3xl font-extrabold text-white tracking-tight mb-1">
-            Surveillance <span className="bg-clip-text text-transparent bg-gradient-to-r from-rose-400 to-pink-200">Dashboard</span>
+          <h1 className="text-3xl font-extrabold text-text tracking-tight mb-1">
+            Surveillance <span className="text-accent">Dashboard</span>
           </h1>
-          <p className="text-slate-400 text-sm">Real-time marketplace price tracking & automated telemetry monitoring.</p>
+          <p className="text-text-muted text-sm">Real-time marketplace price tracking & automated telemetry monitoring.</p>
         </div>
 
-        {/* Global Action Toolbar: Refresh, Retrack All, Delete All */}
+        {/* Global Action Toolbar: Refresh, Scrape All, Delete All */}
         <div className="flex items-center gap-2 flex-wrap">
           <button 
             onClick={() => loadData(true)}
             disabled={refreshing}
-            className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl glass-panel text-slate-200 text-xs font-semibold hover:border-rose-500/40 hover:text-white transition-all shadow-md disabled:opacity-50"
+            className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-surface-2 text-text border border-border hover:border-accent-border text-[13px] font-semibold transition-all shadow-sm disabled:opacity-50 focus-visible:ring-2 focus-visible:ring-accent focus-visible:outline-none"
             title="Refresh dashboard stats & data"
+            aria-label="Refresh dashboard stats & data"
           >
-            <RefreshCw className={`w-3.5 h-3.5 text-rose-400 ${refreshing ? 'animate-spin' : ''}`} />
+            <RefreshCw className={`w-3.5 h-3.5 text-accent ${refreshing ? 'animate-spin' : ''}`} />
             <span>{refreshing ? 'Refreshing...' : 'Refresh'}</span>
           </button>
 
           <button 
             onClick={handleRetrackAll}
             disabled={retrackingAll}
-            className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-rose-500/10 hover:bg-rose-500/20 text-rose-300 border border-rose-500/30 text-xs font-semibold transition-all shadow-md disabled:opacity-50"
-            title="Trigger rescrape for all tracked products"
+            className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl badge-accent hover:bg-accent/20 text-[13px] font-semibold transition-all shadow-sm disabled:opacity-50 focus-visible:ring-2 focus-visible:ring-accent focus-visible:outline-none"
+            title="Trigger scrape for all tracked products"
+            aria-label="Scrape All"
           >
-            <RotateCw className={`w-3.5 h-3.5 text-rose-400 ${retrackingAll ? 'animate-spin' : ''}`} />
-            <span>{retrackingAll ? 'Rescraping All...' : 'Retrack All'}</span>
+            <RotateCw className={`w-3.5 h-3.5 text-accent ${retrackingAll ? 'animate-spin' : ''}`} />
+            <span>{retrackingAll ? 'Rescraping All...' : 'Scrape All'}</span>
           </button>
 
           <button 
             onClick={handleUntrackAll}
             disabled={untrackingAll}
-            className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-rose-500/10 hover:bg-rose-500/20 text-rose-300 border border-rose-500/30 text-xs font-semibold transition-all shadow-md disabled:opacity-50"
+            className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-surface-2 text-text-muted border border-border hover:bg-danger-bg hover:text-danger hover:border-danger-border text-[13px] font-semibold transition-all shadow-sm disabled:opacity-50 focus-visible:ring-2 focus-visible:ring-accent focus-visible:outline-none"
             title="Delete / Untrack all products from database"
+            aria-label="Delete All"
           >
-            <Trash2 className="w-3.5 h-3.5 text-rose-400" />
+            <Trash2 className="w-3.5 h-3.5" />
             <span>{untrackingAll ? 'Deleting All...' : 'Delete All'}</span>
           </button>
         </div>
@@ -269,15 +272,15 @@ export default function Dashboard() {
           value={stats?.tracked ?? products.length} 
           subtext="Total items monitored"
           icon={Box} 
-          colorClass="bg-slate-800/80 text-white border-white/10"
+          badgeClass="badge-accent"
           delay={0.05}
         />
         <StatCard 
           title="In Stock" 
           value={stats?.in_stock ?? 0} 
-          subtext="Available units"
+          subtext="Available items"
           icon={CheckCircle2} 
-          colorClass="bg-rose-500/10 text-rose-400 border-rose-500/20"
+          badgeClass="badge-success"
           delay={0.1}
         />
         <StatCard 
@@ -285,7 +288,7 @@ export default function Dashboard() {
           value={stats?.out_of_stock ?? 0} 
           subtext="Unavailable"
           icon={XCircle} 
-          colorClass="bg-rose-500/10 text-rose-400 border-rose-500/20"
+          badgeClass="badge-danger"
           delay={0.15}
         />
         <StatCard 
@@ -293,7 +296,7 @@ export default function Dashboard() {
           value={stats?.unknown ?? 0} 
           subtext="Never scraped"
           icon={HelpCircle} 
-          colorClass="bg-slate-800 text-slate-400 border-white/10"
+          badgeClass="badge-neutral"
           delay={0.2}
         />
         <StatCard 
@@ -301,27 +304,27 @@ export default function Dashboard() {
           value={`${stats?.success_rate_7d ?? 0}%`} 
           subtext={`${stats?.attempts_7d ?? 0} total attempts`}
           icon={ActivitySquare} 
-          colorClass="bg-teal-500/10 text-teal-300 border-teal-500/20"
+          badgeClass="badge-success"
           delay={0.25}
         />
       </div>
 
       {/* Toolbar: Text Filter, Status Filter Chips, Sorting */}
-      <div className="glass-panel p-4 rounded-2xl mb-6 flex flex-col md:flex-row items-stretch md:items-center justify-between gap-4 border border-white/10">
+      <div className="glass-panel p-4 rounded-[12px] mb-6 flex flex-col md:flex-row items-stretch md:items-center justify-between gap-4 border border-border">
         
         {/* Text Filter */}
         <div className="relative flex-grow max-w-md">
-          <Search className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
+          <Search className="w-4 h-4 text-text-muted absolute left-3.5 top-1/2 -translate-y-1/2" />
           <input 
             type="text"
             value={searchFilter}
             onChange={(e) => setSearchFilter(e.target.value)}
             placeholder="Filter by name, brand, SKU..."
-            className="w-full bg-slate-900/60 border border-white/10 rounded-xl pl-10 pr-4 py-2 text-sm text-white placeholder:text-slate-500 focus:outline-none focus:border-rose-500/50"
+            className="w-full bg-surface-2 border border-border rounded-xl pl-10 pr-4 py-2 text-sm text-text placeholder:text-text-muted focus:outline-none focus:border-accent"
           />
         </div>
 
-        {/* Status Filter Chips */}
+        {/* Status Filter Chips (Active chip = --accent per STEP 1) */}
         <div className="flex items-center gap-1.5 overflow-x-auto pb-1 md:pb-0 scrollbar-none">
           {[
             { key: 'all', label: 'All' },
@@ -333,10 +336,10 @@ export default function Dashboard() {
             <button
               key={chip.key}
               onClick={() => setStatusFilter(chip.key)}
-              className={`px-3 py-1.5 rounded-xl text-xs font-semibold whitespace-nowrap transition-all border ${
+              className={`px-3 py-1.5 rounded-xl text-xs font-semibold whitespace-nowrap transition-all border focus-visible:ring-2 focus-visible:ring-accent focus-visible:outline-none ${
                 statusFilter === chip.key
-                  ? 'bg-rose-500/20 text-rose-300 border-rose-500/40 shadow-sm'
-                  : 'bg-slate-900/40 text-slate-400 border-white/10 hover:text-slate-200'
+                  ? 'badge-accent shadow-sm'
+                  : 'bg-surface-2 text-text-muted border-border hover:text-text'
               }`}
             >
               {chip.label}
@@ -346,11 +349,11 @@ export default function Dashboard() {
 
         {/* Sort Select */}
         <div className="flex items-center gap-2">
-          <SlidersHorizontal className="w-4 h-4 text-slate-400 hidden lg:block" />
+          <SlidersHorizontal className="w-4 h-4 text-text-muted hidden lg:block" />
           <select
             value={sortBy}
             onChange={(e) => setSortBy(e.target.value)}
-            className="bg-slate-900/60 text-slate-200 border border-white/10 rounded-xl px-3 py-2 text-xs font-semibold focus:outline-none focus:border-rose-500/50 cursor-pointer"
+            className="bg-surface-2 text-text border border-border rounded-xl px-3 py-2 text-xs font-semibold focus:outline-none focus:border-accent cursor-pointer"
           >
             <option value="recent">Recently Scraped</option>
             <option value="price_asc">Price: Low to High</option>
@@ -381,7 +384,7 @@ export default function Dashboard() {
             <div className="flex justify-center mt-4">
               <button
                 onClick={() => setDisplayCount(prev => prev + 12)}
-                className="px-8 py-3 rounded-xl glass-panel text-sm font-semibold text-rose-400 border border-rose-500/30 hover:bg-rose-500/10 transition-all shadow-lg flex items-center gap-2"
+                className="px-8 py-3 rounded-xl glass-panel text-sm font-semibold text-accent border border-accent-border hover:bg-accent/10 transition-all shadow-md flex items-center gap-2 focus-visible:ring-2 focus-visible:ring-accent focus-visible:outline-none"
               >
                 <span>Load More Products ({filteredProducts.length - displayCount} remaining)</span>
                 <ChevronDown className="w-4 h-4" />
@@ -390,8 +393,8 @@ export default function Dashboard() {
           )}
         </>
       ) : (
-        <div className="glass-panel p-12 rounded-3xl text-center border border-dashed border-white/15 my-6">
-          <p className="text-slate-400 text-sm">No tracked products match the selected filters.</p>
+        <div className="glass-panel p-12 rounded-[12px] text-center border border-dashed border-border my-6">
+          <p className="text-text-muted text-sm">No tracked products match the selected filters.</p>
         </div>
       )}
     </div>
