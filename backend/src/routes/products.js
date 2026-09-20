@@ -152,7 +152,6 @@ router.get('/stats', async (req, res, next) => {
       }
     });
 
-    // 7-day scrape logs telemetries
     const sevenDaysAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString();
     const { data: logs7d, error: lErr } = await supabase
       .from('scrape_logs')
@@ -208,7 +207,53 @@ router.get('/products', async (req, res, next) => {
 });
 
 // -------------------------------------------------------------------
-// 3. GET /api/products/:id -> Single product full details
+// 3. GET / POST /api/products/scrape-all -> Rescrape all tracked products
+// MUST BE REGISTERED BEFORE /products/:id to prevent Express path collision!
+// -------------------------------------------------------------------
+router.all('/products/scrape-all', async (req, res, next) => {
+  try {
+    const { data: products, error } = await supabase.from('products').select('*');
+    if (error) throw new Error(`Database error: ${error.message}`);
+
+    const results = await Promise.all(products.map(async (product) => {
+      const startTime = Date.now();
+      const scrapeResult = await scrapeWithRetry(product.external_id);
+      const durationMs = Date.now() - startTime;
+      const errorCode = mapErrorCode(scrapeResult.status, scrapeResult.message);
+
+      await supabase.from('scrape_logs').insert({
+        product_id: product.id,
+        status: scrapeResult.status,
+        attempts: scrapeResult.attempts,
+        message: scrapeResult.message,
+        duration_ms: durationMs
+      });
+
+      if (scrapeResult.ok && scrapeResult.data) {
+        const sd = scrapeResult.data;
+        await supabase.from('price_history').insert({
+          product_id: product.id,
+          price: sd.price,
+          in_stock: sd.inStock
+        });
+      }
+
+      return {
+        product_id: product.id,
+        status: scrapeResult.status,
+        ok: scrapeResult.ok,
+        error_code: errorCode
+      };
+    }));
+
+    res.json({ ok: true, count: results.length, results });
+  } catch (err) {
+    next(err);
+  }
+});
+
+// -------------------------------------------------------------------
+// 4. GET /api/products/:id -> Single product full details
 // -------------------------------------------------------------------
 router.get('/products/:id', async (req, res, next) => {
   try {
@@ -253,7 +298,7 @@ router.get('/products/:id', async (req, res, next) => {
 });
 
 // -------------------------------------------------------------------
-// 4. GET /api/products/:id/history?range=24h|7d|30d|all
+// 5. GET /api/products/:id/history?range=24h|7d|30d|all
 // -------------------------------------------------------------------
 router.get('/products/:id/history', async (req, res, next) => {
   try {
@@ -286,7 +331,7 @@ router.get('/products/:id/history', async (req, res, next) => {
 });
 
 // -------------------------------------------------------------------
-// 5. GET /api/products/:id/logs?limit=50&status=...
+// 6. GET /api/products/:id/logs?limit=50&status=...
 // -------------------------------------------------------------------
 router.get('/products/:id/logs', async (req, res, next) => {
   try {
@@ -319,54 +364,7 @@ router.get('/products/:id/logs', async (req, res, next) => {
 });
 
 // -------------------------------------------------------------------
-// 6a. GET / POST /api/products/scrape-all -> Rescrape all tracked products
-// -------------------------------------------------------------------
-router.all('/products/scrape-all', async (req, res, next) => {
-  try {
-    const { data: products, error } = await supabase.from('products').select('*');
-    if (error) throw new Error(`Database error: ${error.message}`);
-
-    const results = await Promise.all(products.map(async (product) => {
-      const startTime = Date.now();
-      const scrapeResult = await scrapeWithRetry(product.external_id);
-      const durationMs = Date.now() - startTime;
-      const errorCode = mapErrorCode(scrapeResult.status, scrapeResult.message);
-
-      // Insert scrape log safely using valid schema columns
-      await supabase.from('scrape_logs').insert({
-        product_id: product.id,
-        status: scrapeResult.status,
-        attempts: scrapeResult.attempts,
-        message: scrapeResult.message,
-        duration_ms: durationMs
-      });
-
-      // Insert price history if scrape succeeded
-      if (scrapeResult.ok && scrapeResult.data) {
-        const sd = scrapeResult.data;
-        await supabase.from('price_history').insert({
-          product_id: product.id,
-          price: sd.price,
-          in_stock: sd.inStock
-        });
-      }
-
-      return {
-        product_id: product.id,
-        status: scrapeResult.status,
-        ok: scrapeResult.ok,
-        error_code: errorCode
-      };
-    }));
-
-    res.json({ ok: true, count: results.length, results });
-  } catch (err) {
-    next(err);
-  }
-});
-
-// -------------------------------------------------------------------
-// 6b. POST /api/products/:id/scrape -> Single rescrape (Rate-limit 1/30s)
+// 7. POST /api/products/:id/scrape -> Single rescrape (Rate-limit 1/30s)
 // -------------------------------------------------------------------
 router.post('/products/:id/scrape', async (req, res, next) => {
   try {
@@ -400,7 +398,6 @@ router.post('/products/:id/scrape', async (req, res, next) => {
     const durationMs = Date.now() - startTime;
     const errorCode = mapErrorCode(scrapeResult.status, scrapeResult.message);
 
-    // Insert scrape log safely using valid schema columns
     const { data: logData, error: logError } = await supabase
       .from('scrape_logs')
       .insert({
@@ -415,7 +412,6 @@ router.post('/products/:id/scrape', async (req, res, next) => {
 
     if (logError) console.error('Failed to insert scrape log:', logError);
 
-    // Insert price history if scrape succeeded
     if (scrapeResult.ok && scrapeResult.data) {
       const sd = scrapeResult.data;
       await supabase.from('price_history').insert({
@@ -440,7 +436,7 @@ router.post('/products/:id/scrape', async (req, res, next) => {
 });
 
 // -------------------------------------------------------------------
-// 7. PATCH /api/products/:id { scrape_interval_minutes }
+// 8. PATCH /api/products/:id { scrape_interval_minutes }
 // -------------------------------------------------------------------
 router.patch('/products/:id', async (req, res, next) => {
   try {
@@ -468,7 +464,7 @@ router.patch('/products/:id', async (req, res, next) => {
 });
 
 // -------------------------------------------------------------------
-// 8. POST /api/track -> Track product
+// 9. POST /api/track -> Track product
 // -------------------------------------------------------------------
 router.post('/track', async (req, res, next) => {
   try {
@@ -531,7 +527,7 @@ router.post('/track', async (req, res, next) => {
 });
 
 // -------------------------------------------------------------------
-// 9. DELETE /api/products -> Untrack all
+// 10. DELETE /api/products -> Untrack all
 // -------------------------------------------------------------------
 router.delete('/products', async (req, res, next) => {
   try {
@@ -548,7 +544,7 @@ router.delete('/products', async (req, res, next) => {
 });
 
 // -------------------------------------------------------------------
-// 10. DELETE /api/products/:id -> Untrack single product
+// 11. DELETE /api/products/:id -> Untrack single product
 // -------------------------------------------------------------------
 router.delete('/products/:id', async (req, res, next) => {
   try {
