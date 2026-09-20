@@ -1,5 +1,5 @@
-// Base URL for the API. Read from Vite's env.
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
+// Base URL for the API. Read from Vite's env and strip trailing slashes to prevent double-slash 404 errors.
+const API_URL = (import.meta.env.VITE_API_URL || 'http://localhost:3000').replace(/\/+$/, '');
 
 let activeSlowTimeouts = new Set();
 let activeRequestCount = 0;
