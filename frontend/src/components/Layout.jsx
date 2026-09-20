@@ -16,11 +16,11 @@ function Navbar() {
     <header className="fixed top-4 left-0 right-0 z-50 flex justify-center px-4 pointer-events-none">
       <div className="glass-panel rounded-full px-6 py-3 flex items-center justify-between w-full max-w-5xl pointer-events-auto border border-white/10 shadow-2xl">
         <Link to="/" className="flex items-center gap-3">
-          <div className="w-9 h-9 rounded-xl bg-emerald-500/20 flex items-center justify-center border border-emerald-500/30 shadow-lg shadow-emerald-500/10">
-            <Package className="w-5 h-5 text-emerald-400" />
+          <div className="w-9 h-9 rounded-xl bg-rose-500/20 flex items-center justify-center border border-rose-500/30 shadow-lg shadow-rose-500/10">
+            <Package className="w-5 h-5 text-rose-400" />
           </div>
           <span className="text-xl font-extrabold text-white tracking-tight flex items-center gap-1">
-            Price<span className="text-emerald-400 font-black">Pulse</span>
+            Price<span className="text-rose-400 font-black">Pulse</span>
           </span>
         </Link>
 
@@ -39,11 +39,11 @@ function Navbar() {
                 {isActive && (
                   <motion.div
                     layoutId="navbar-active"
-                    className="absolute inset-0 bg-emerald-500/20 border border-emerald-500/40 rounded-full shadow-lg shadow-emerald-500/10"
+                    className="absolute inset-0 bg-rose-500/20 border border-rose-500/40 rounded-full shadow-lg shadow-rose-500/10"
                     transition={{ type: 'spring', stiffness: 380, damping: 30 }}
                   />
                 )}
-                <Icon className={`w-4 h-4 relative z-10 ${isActive ? 'text-emerald-400' : 'text-slate-400'}`} />
+                <Icon className={`w-4 h-4 relative z-10 ${isActive ? 'text-rose-400' : 'text-slate-400'}`} />
                 <span className="relative z-10">{item.label}</span>
               </Link>
             );
@@ -72,7 +72,7 @@ export default function Layout({ children }) {
 
   return (
     <ErrorBoundary>
-      <div className="min-h-screen flex flex-col text-slate-100 selection:bg-emerald-500/30 selection:text-emerald-200 bg-[#090D16]">
+      <div className="min-h-screen flex flex-col text-slate-100 selection:bg-rose-500/30 selection:text-rose-200 bg-[#0A0A0A]">
         <Navbar />
 
         <main className="relative flex-grow pt-28 pb-16 px-4 w-full max-w-7xl mx-auto">

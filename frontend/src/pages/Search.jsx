@@ -127,9 +127,9 @@ export default function Search() {
             initial={{ opacity: 0, y: -20 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -20 }}
-            className="fixed top-20 right-4 z-50 glass-panel border-emerald-500/40 bg-emerald-500/10 text-emerald-200 px-5 py-3 rounded-2xl shadow-2xl flex items-center gap-3 border"
+            className="fixed top-20 right-4 z-50 glass-panel border-rose-500/40 bg-rose-500/10 text-rose-200 px-5 py-3 rounded-2xl shadow-2xl flex items-center gap-3 border"
           >
-            <CheckCircle2 className="w-5 h-5 text-emerald-400 flex-shrink-0" />
+            <CheckCircle2 className="w-5 h-5 text-rose-400 flex-shrink-0" />
             <span className="text-sm font-semibold">{toastMessage}</span>
           </motion.div>
         )}
@@ -138,7 +138,7 @@ export default function Search() {
       {/* Header */}
       <div className="text-center mb-8">
         <h1 className="text-3xl md:text-4xl font-extrabold text-white tracking-tight mb-3">
-          Discover & <span className="bg-clip-text text-transparent bg-gradient-to-r from-emerald-400 via-teal-200 to-indigo-300">Track Catalog Items</span>
+          Discover & <span className="bg-clip-text text-transparent bg-gradient-to-r from-rose-400 via-pink-200 to-rose-300">Track Catalog Items</span>
         </h1>
         <p className="text-slate-400 text-sm md:text-base max-w-xl mx-auto">
           Search store products by name, brand, SKU, category, or Product ID to start monitoring prices and stock updates.
@@ -149,9 +149,7 @@ export default function Search() {
       <div className="relative max-w-3xl mx-auto w-full mb-8">
         <div className="glass-panel rounded-2xl p-2 flex items-center border border-white/10 shadow-2xl">
           <div className="pl-4 pr-3 text-slate-400">
-            <SearchIcon className="w-5 h-5 text-emerald-400" />
-          </div>
-          <input 
+            <SearchIcon className="w-5 h-5 text-rose-400" />\n          </div>\n          <input 
             type="text"
             value={query}
             onChange={(e) => setQuery(e.target.value)}
@@ -159,7 +157,7 @@ export default function Search() {
             className="w-full bg-transparent border-none py-3 text-base text-white placeholder:text-slate-500 focus:outline-none focus:ring-0"
           />
           {loading && (
-            <div className="pr-4 text-emerald-400">
+            <div className="pr-4 text-rose-400">
               <Loader2 className="w-5 h-5 animate-spin" />
             </div>
           )}
@@ -176,7 +174,7 @@ export default function Search() {
                 onClick={() => setSelectedCategory(cat)}
                 className={`px-3 py-1.5 rounded-xl text-xs font-semibold whitespace-nowrap transition-all border ${
                   selectedCategory === cat
-                    ? 'bg-emerald-500/20 text-emerald-300 border-emerald-500/40 shadow-sm'
+                    ? 'bg-rose-500/20 text-rose-300 border-rose-500/40 shadow-sm'
                     : 'bg-slate-900/40 text-slate-400 border-white/10 hover:text-slate-200'
                 }`}
               >
@@ -216,7 +214,7 @@ export default function Search() {
                   <div>
                     {/* Top Row: Category Icon & SKU */}
                     <div className="flex items-center justify-between gap-2 mb-4">
-                      <div className="w-10 h-10 rounded-xl bg-slate-900/80 border border-white/10 flex items-center justify-center text-emerald-400">
+                      <div className="w-10 h-10 rounded-xl bg-zinc-900/80 border border-white/10 flex items-center justify-center text-rose-400">
                         <CategoryIcon className="w-5 h-5" />
                       </div>
                       <span className="text-xs font-mono text-slate-400 bg-slate-900/60 px-2 py-1 rounded-md border border-white/5">
@@ -226,7 +224,7 @@ export default function Search() {
 
                     {/* Brand Badge */}
                     {product.brand && (
-                      <span className="text-xs font-semibold text-emerald-400 uppercase tracking-wider block mb-1">
+                      <span className="text-xs font-semibold text-rose-400 uppercase tracking-wider block mb-1">
                         {product.brand}
                       </span>
                     )}
@@ -260,7 +258,7 @@ export default function Search() {
                       <button
                         onClick={() => handleTrackItem(product)}
                         disabled={isTracking}
-                        className="w-full py-2.5 rounded-xl bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 text-xs font-semibold shadow-md hover:bg-emerald-500 hover:text-white transition-all flex items-center justify-center gap-1.5 disabled:opacity-50"
+                        className="w-full py-2.5 rounded-xl bg-rose-500/20 text-rose-300 border border-rose-500/30 text-xs font-semibold shadow-md hover:bg-rose-500 hover:text-white transition-all flex items-center justify-center gap-1.5 disabled:opacity-50"
                       >
                         {isTracking ? <Loader2 className="w-4 h-4 animate-spin" /> : <Plus className="w-4 h-4" />}
                         <span>{isTracking ? 'Tracking...' : 'Track'}</span>
@@ -277,7 +275,7 @@ export default function Search() {
             <div className="flex justify-center mb-12">
               <button
                 onClick={() => setDisplayCount(prev => prev + 12)}
-                className="px-8 py-3 rounded-xl glass-panel text-xs font-semibold text-emerald-400 border border-emerald-500/30 hover:bg-emerald-500/10 transition-all shadow-lg"
+                className="px-8 py-3 rounded-xl glass-panel text-xs font-semibold text-rose-400 border border-rose-500/30 hover:bg-rose-500/10 transition-all shadow-lg"
               >
                 Load More Results ({filteredResults.length - displayCount} remaining)
               </button>
@@ -294,7 +292,7 @@ export default function Search() {
       ) : (
         /* Default / Initial Search State */
         <div className="glass-panel p-10 rounded-3xl text-center border border-white/10 my-4 max-w-2xl mx-auto">
-          <div className="w-16 h-16 rounded-2xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-400 mx-auto mb-4">
+          <div className="w-16 h-16 rounded-2xl bg-rose-500/10 border border-rose-500/20 flex items-center justify-center text-rose-400 mx-auto mb-4">
             <SearchIcon className="w-8 h-8" />
           </div>
           <h3 className="text-lg font-bold text-white mb-2">Search Store Catalog</h3>

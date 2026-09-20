@@ -212,9 +212,9 @@ export default function Dashboard() {
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
           exit={{ opacity: 0, y: -20 }}
-          className="fixed top-20 right-6 z-50 px-4 py-3 rounded-xl bg-slate-900 border border-emerald-500/40 text-emerald-300 text-xs font-semibold shadow-2xl backdrop-blur-xl flex items-center gap-2"
+          className="fixed top-20 right-6 z-50 px-4 py-3 rounded-xl bg-slate-900 border border-rose-500/40 text-rose-300 text-xs font-semibold shadow-2xl backdrop-blur-xl flex items-center gap-2"
         >
-          <div className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+          <div className="w-2 h-2 rounded-full bg-rose-400 animate-pulse" />
           <span>{toastMessage}</span>
         </motion.div>
       )}
@@ -223,7 +223,7 @@ export default function Dashboard() {
       <div className="mb-6 flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
           <h1 className="text-3xl font-extrabold text-white tracking-tight mb-1">
-            Surveillance <span className="bg-clip-text text-transparent bg-gradient-to-r from-emerald-400 to-teal-200">Dashboard</span>
+            Surveillance <span className="bg-clip-text text-transparent bg-gradient-to-r from-rose-400 to-pink-200">Dashboard</span>
           </h1>
           <p className="text-slate-400 text-sm">Real-time marketplace price tracking & automated telemetry monitoring.</p>
         </div>
@@ -233,20 +233,20 @@ export default function Dashboard() {
           <button 
             onClick={() => loadData(true)}
             disabled={refreshing}
-            className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl glass-panel text-slate-200 text-xs font-semibold hover:border-emerald-500/40 hover:text-white transition-all shadow-md disabled:opacity-50"
+            className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl glass-panel text-slate-200 text-xs font-semibold hover:border-rose-500/40 hover:text-white transition-all shadow-md disabled:opacity-50"
             title="Refresh dashboard stats & data"
           >
-            <RefreshCw className={`w-3.5 h-3.5 text-emerald-400 ${refreshing ? 'animate-spin' : ''}`} />
+            <RefreshCw className={`w-3.5 h-3.5 text-rose-400 ${refreshing ? 'animate-spin' : ''}`} />
             <span>{refreshing ? 'Refreshing...' : 'Refresh'}</span>
           </button>
 
           <button 
             onClick={handleRetrackAll}
             disabled={retrackingAll}
-            className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 text-xs font-semibold transition-all shadow-md disabled:opacity-50"
+            className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-rose-500/10 hover:bg-rose-500/20 text-rose-300 border border-rose-500/30 text-xs font-semibold transition-all shadow-md disabled:opacity-50"
             title="Trigger rescrape for all tracked products"
           >
-            <RotateCw className={`w-3.5 h-3.5 text-emerald-400 ${retrackingAll ? 'animate-spin' : ''}`} />
+            <RotateCw className={`w-3.5 h-3.5 text-rose-400 ${retrackingAll ? 'animate-spin' : ''}`} />
             <span>{retrackingAll ? 'Rescraping All...' : 'Retrack All'}</span>
           </button>
 
@@ -277,7 +277,7 @@ export default function Dashboard() {
           value={stats?.in_stock ?? 0} 
           subtext="Available units"
           icon={CheckCircle2} 
-          colorClass="bg-emerald-500/10 text-emerald-400 border-emerald-500/20"
+          colorClass="bg-rose-500/10 text-rose-400 border-rose-500/20"
           delay={0.1}
         />
         <StatCard 
@@ -317,7 +317,7 @@ export default function Dashboard() {
             value={searchFilter}
             onChange={(e) => setSearchFilter(e.target.value)}
             placeholder="Filter by name, brand, SKU..."
-            className="w-full bg-slate-900/60 border border-white/10 rounded-xl pl-10 pr-4 py-2 text-sm text-white placeholder:text-slate-500 focus:outline-none focus:border-emerald-500/50"
+            className="w-full bg-slate-900/60 border border-white/10 rounded-xl pl-10 pr-4 py-2 text-sm text-white placeholder:text-slate-500 focus:outline-none focus:border-rose-500/50"
           />
         </div>
 
@@ -335,7 +335,7 @@ export default function Dashboard() {
               onClick={() => setStatusFilter(chip.key)}
               className={`px-3 py-1.5 rounded-xl text-xs font-semibold whitespace-nowrap transition-all border ${
                 statusFilter === chip.key
-                  ? 'bg-emerald-500/20 text-emerald-300 border-emerald-500/40 shadow-sm'
+                  ? 'bg-rose-500/20 text-rose-300 border-rose-500/40 shadow-sm'
                   : 'bg-slate-900/40 text-slate-400 border-white/10 hover:text-slate-200'
               }`}
             >
@@ -350,7 +350,7 @@ export default function Dashboard() {
           <select
             value={sortBy}
             onChange={(e) => setSortBy(e.target.value)}
-            className="bg-slate-900/60 text-slate-200 border border-white/10 rounded-xl px-3 py-2 text-xs font-semibold focus:outline-none focus:border-emerald-500/50 cursor-pointer"
+            className="bg-slate-900/60 text-slate-200 border border-white/10 rounded-xl px-3 py-2 text-xs font-semibold focus:outline-none focus:border-rose-500/50 cursor-pointer"
           >
             <option value="recent">Recently Scraped</option>
             <option value="price_asc">Price: Low to High</option>
@@ -381,7 +381,7 @@ export default function Dashboard() {
             <div className="flex justify-center mt-4">
               <button
                 onClick={() => setDisplayCount(prev => prev + 12)}
-                className="px-8 py-3 rounded-xl glass-panel text-sm font-semibold text-emerald-400 border border-emerald-500/30 hover:bg-emerald-500/10 transition-all shadow-lg flex items-center gap-2"
+                className="px-8 py-3 rounded-xl glass-panel text-sm font-semibold text-rose-400 border border-rose-500/30 hover:bg-rose-500/10 transition-all shadow-lg flex items-center gap-2"
               >
                 <span>Load More Products ({filteredProducts.length - displayCount} remaining)</span>
                 <ChevronDown className="w-4 h-4" />

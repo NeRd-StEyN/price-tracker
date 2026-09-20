@@ -9,8 +9,8 @@ export function StockBadge({ stockState, stockUnits }) {
   if (stockState === 'in_stock') {
     const label = stockUnits && stockUnits > 0 ? `${stockUnits} in stock` : 'In stock';
     return (
-      <span className="px-2.5 py-1 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 text-xs font-semibold flex items-center gap-1.5 shadow-sm">
-        <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
+      <span className="px-2.5 py-1 rounded-full bg-rose-500/20 text-rose-300 border border-rose-500/30 text-xs font-semibold flex items-center gap-1.5 shadow-sm">
+        <span className="w-1.5 h-1.5 rounded-full bg-rose-400 animate-pulse"></span>
         <span>{label}</span>
       </span>
     );
@@ -40,8 +40,8 @@ export function StockBadge({ stockState, stockUnits }) {
 export function StatusBadge({ status }) {
   if (status === 'success') {
     return (
-      <span className="px-2.5 py-1 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 text-xs font-semibold flex items-center gap-1 shadow-sm">
-        <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400" />
+      <span className="px-2.5 py-1 rounded-full bg-rose-500/10 text-rose-400 border border-rose-500/20 text-xs font-semibold flex items-center gap-1 shadow-sm">
+        <CheckCircle2 className="w-3.5 h-3.5 text-rose-400" />
         <span>Success</span>
       </span>
     );

@@ -38,7 +38,7 @@ export default function ProductCard({ product, onRetrack, onUntrack, isRetrackin
       <div>
         {/* Top Header Row: Category Icon + Badges */}
         <div className="flex items-start justify-between gap-3 mb-4">
-          <div className="w-10 h-10 rounded-xl bg-slate-900/80 border border-white/10 flex items-center justify-center text-emerald-400 group-hover:scale-105 transition-transform flex-shrink-0">
+          <div className="w-10 h-10 rounded-xl bg-zinc-900/80 border border-white/10 flex items-center justify-center text-rose-400 group-hover:scale-105 transition-transform flex-shrink-0">
             <CategoryIcon className="w-5 h-5" />
           </div>
 
@@ -57,7 +57,7 @@ export default function ProductCard({ product, onRetrack, onUntrack, isRetrackin
         </div>
 
         {/* Product Title */}
-        <h3 className="font-bold text-slate-100 text-base line-clamp-2 leading-snug mb-4 group-hover:text-emerald-400 transition-colors">
+        <h3 className="font-bold text-slate-100 text-base line-clamp-2 leading-snug mb-4 group-hover:text-rose-400 transition-colors">
           {product.name}
         </h3>
 
@@ -75,7 +75,7 @@ export default function ProductCard({ product, onRetrack, onUntrack, isRetrackin
             )}
 
             {discountPct && (
-              <span className="text-xs font-bold text-emerald-400">
+              <span className="text-xs font-bold text-rose-400">
                 {discountPct}% OFF
               </span>
             )}
@@ -117,7 +117,7 @@ export default function ProductCard({ product, onRetrack, onUntrack, isRetrackin
               }}
               disabled={isRetracking}
               title="Retrack this product"
-              className="px-2 py-1 rounded-lg bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-300 border border-emerald-500/20 transition-all flex items-center gap-1 font-semibold text-[11px] shadow-sm disabled:opacity-50"
+              className="px-2 py-1 rounded-lg bg-rose-500/10 hover:bg-rose-500/20 text-rose-300 border border-rose-500/20 transition-all flex items-center gap-1 font-semibold text-[11px] shadow-sm disabled:opacity-50"
             >
               <RefreshCw className={`w-3 h-3 ${isRetracking ? 'animate-spin' : ''}`} />
               <span>Retrack</span>

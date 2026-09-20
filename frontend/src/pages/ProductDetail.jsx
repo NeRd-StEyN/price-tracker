@@ -140,7 +140,7 @@ export default function ProductDetail() {
         onClick={() => navigate(-1)} 
         className="flex items-center gap-2 text-slate-400 hover:text-white mb-6 w-fit transition-colors text-sm font-semibold"
       >
-        <ArrowLeft className="w-4 h-4 text-emerald-400" />
+        <ArrowLeft className="w-4 h-4 text-rose-400" />
         <span>Back to Dashboard</span>
       </button>
 
@@ -184,7 +184,7 @@ export default function ProductDetail() {
             exit={{ opacity: 0, y: -10 }}
             className={`mb-6 p-4 rounded-2xl border text-xs font-medium flex items-center justify-between gap-4 shadow-xl ${
               scrapeResultInline.status === 'success' || scrapeResultInline.status === 'retried'
-                ? 'glass-panel border-emerald-500/30 bg-emerald-500/10 text-emerald-200'
+                ? 'glass-panel border-rose-500/30 bg-rose-500/10 text-rose-200'
                 : 'glass-panel border-rose-500/30 bg-rose-500/10 text-rose-200'
             }`}
           >
@@ -206,7 +206,7 @@ export default function ProductDetail() {
           <div>
             <div className="flex items-center justify-between gap-3 mb-6">
               <span className="px-3 py-1 bg-slate-900/80 text-slate-300 text-xs font-mono font-semibold rounded-full border border-white/10 flex items-center gap-1.5">
-                <Target className="w-3.5 h-3.5 text-emerald-400" />
+                <Target className="w-3.5 h-3.5 text-rose-400" />
                 {product.sku || `ID #${product.external_id}`}
               </span>
 
@@ -232,7 +232,7 @@ export default function ProductDetail() {
             href={`https://demo.inelabteamdev.com/product/${extId}`}
             target="_blank" 
             rel="noopener noreferrer" 
-            className="w-full py-3 bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 rounded-xl font-semibold flex items-center justify-center gap-2 hover:bg-emerald-500 hover:text-white transition-all text-sm shadow-lg"
+            className="w-full py-3 bg-rose-500/20 text-rose-300 border border-rose-500/30 rounded-xl font-semibold flex items-center justify-center gap-2 hover:bg-rose-500 hover:text-white transition-all text-sm shadow-lg"
           >
             <span>Open in Merchant Store</span>
             <ExternalLink className="w-4 h-4" />
@@ -245,7 +245,7 @@ export default function ProductDetail() {
             {/* Brand & Category */}
             <div className="flex items-center gap-3 mb-3">
               {product.brand && (
-                <span className="text-xs font-extrabold uppercase tracking-widest text-emerald-400 bg-emerald-500/10 px-3 py-1 rounded-md border border-emerald-500/20">
+                <span className="text-xs font-extrabold uppercase tracking-widest text-rose-400 bg-rose-500/10 px-3 py-1 rounded-md border border-rose-500/20">
                   {product.brand}
                 </span>
               )}
@@ -271,7 +271,7 @@ export default function ProductDetail() {
                     </span>
                   )}
                   {discountPct && (
-                    <span className="text-xs font-bold text-emerald-400">
+                    <span className="text-xs font-bold text-rose-400">
                       {discountPct}% OFF
                     </span>
                   )}
@@ -280,7 +280,7 @@ export default function ProductDetail() {
 
               <div className="bg-slate-900/60 border border-white/10 p-5 rounded-2xl">
                 <span className="text-xs text-slate-400 font-semibold uppercase tracking-wider mb-1 block flex items-center gap-1">
-                  <TrendingDown className="w-3.5 h-3.5 text-emerald-400" /> Lowest Recorded
+                  <TrendingDown className="w-3.5 h-3.5 text-rose-400" /> Lowest Recorded
                 </span>
                 <span className="text-2xl font-extrabold text-emerald-400 tracking-tight">
                   {formatPrice(product.min_price)}
@@ -320,7 +320,7 @@ export default function ProductDetail() {
               </div>
               <div>
                 <span className="text-slate-500 block mb-0.5">Available Units</span>
-                <span className="font-bold text-emerald-400">
+                <span className="font-bold text-rose-400">
                   {latestGood?.stock_units ? `${latestGood.stock_units} units` : (latestGood?.in_stock ? 'In stock' : '0 units')}
                 </span>
               </div>
@@ -333,7 +333,7 @@ export default function ProductDetail() {
               <button
                 onClick={handleScrapeNow}
                 disabled={scraping}
-                className="px-4 py-2.5 rounded-xl bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 text-xs font-semibold hover:bg-emerald-500 hover:text-white transition-all shadow-md flex items-center gap-2 disabled:opacity-50"
+                className="px-4 py-2.5 rounded-xl bg-rose-500/20 text-rose-300 border border-rose-500/30 text-xs font-semibold hover:bg-rose-500 hover:text-white transition-all shadow-md flex items-center gap-2 disabled:opacity-50"
               >
                 <RefreshCw className={`w-3.5 h-3.5 ${scraping ? 'animate-spin' : ''}`} />
                 <span>{scraping ? 'Scraping...' : 'Scrape Now'}</span>
@@ -347,7 +347,7 @@ export default function ProductDetail() {
                   value={product.scrape_interval_minutes}
                   onChange={handleIntervalChange}
                   disabled={updatingInterval}
-                  className="bg-slate-900 border border-white/10 text-white rounded-lg px-2.5 py-1 text-xs font-semibold focus:outline-none focus:border-emerald-500 cursor-pointer"
+                  className="bg-slate-900 border border-white/10 text-white rounded-lg px-2.5 py-1 text-xs font-semibold focus:outline-none focus:border-rose-500 cursor-pointer"
                 >
                   <option value={60}>1h</option>
                   <option value={120}>2h</option>
@@ -386,7 +386,7 @@ export default function ProductDetail() {
                 onClick={() => setChartRange(r)}
                 className={`px-3 py-1 rounded-lg text-xs font-semibold transition-all ${
                   chartRange === r
-                    ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/30'
+                    ? 'bg-rose-500/20 text-rose-300 border border-rose-500/30'
                     : 'text-slate-400 hover:text-white'
                 }`}
               >
@@ -437,7 +437,7 @@ export default function ProductDetail() {
           </div>
         ) : (
           <div className="h-48 flex flex-col items-center justify-center text-slate-400 bg-slate-900/40 rounded-2xl border border-dashed border-white/10">
-            <Activity className="w-8 h-8 mb-2 opacity-50 text-emerald-400" />
+            <Activity className="w-8 h-8 mb-2 opacity-50 text-rose-400" />
             <p className="text-xs">Not enough data yet (need 2+ readings)</p>
           </div>
         )}
@@ -449,7 +449,7 @@ export default function ProductDetail() {
           <button
             onClick={() => setActiveTab('history')}
             className={`text-sm font-bold pb-1 transition-all ${
-              activeTab === 'history' ? 'text-emerald-400 border-b-2 border-emerald-400' : 'text-slate-400 hover:text-white'
+              activeTab === 'history' ? 'text-rose-400 border-b-2 border-rose-400' : 'text-slate-400 hover:text-white'
             }`}
           >
             Price & Stock History ({history.length})
@@ -457,7 +457,7 @@ export default function ProductDetail() {
           <button
             onClick={() => setActiveTab('logs')}
             className={`text-sm font-bold pb-1 transition-all ${
-              activeTab === 'logs' ? 'text-emerald-400 border-b-2 border-emerald-400' : 'text-slate-400 hover:text-white'
+              activeTab === 'logs' ? 'text-rose-400 border-b-2 border-rose-400' : 'text-slate-400 hover:text-white'
             }`}
           >
             Scrape Log ({logs.length})
@@ -466,7 +466,7 @@ export default function ProductDetail() {
             <button
               onClick={() => setActiveTab('specs')}
               className={`text-sm font-bold pb-1 transition-all ${
-                activeTab === 'specs' ? 'text-emerald-400 border-b-2 border-emerald-400' : 'text-slate-400 hover:text-white'
+                activeTab === 'specs' ? 'text-rose-400 border-b-2 border-rose-400' : 'text-slate-400 hover:text-white'
               }`}
             >
               Technical Specs
@@ -523,7 +523,7 @@ export default function ProductDetail() {
                   onClick={() => setLogStatusFilter(st)}
                   className={`px-2.5 py-1 rounded-lg text-xs font-semibold capitalize border ${
                     logStatusFilter === st
-                      ? 'bg-emerald-500/20 text-emerald-300 border-emerald-500/40'
+                      ? 'bg-rose-500/20 text-rose-300 border-rose-500/40'
                       : 'bg-slate-900/40 text-slate-400 border-white/10 hover:text-white'
                   }`}
                 >
