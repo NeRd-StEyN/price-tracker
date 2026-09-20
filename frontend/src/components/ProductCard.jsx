@@ -126,10 +126,9 @@ export default function ProductCard({ product, onRetrack, onUntrack, isRetrackin
               disabled={isRetracking}
               title="Trigger fresh scrape"
               aria-label="Scrape now"
-              className="h-9 min-w-[36px] px-2.5 rounded-lg badge-accent hover:bg-accent/20 transition-all flex items-center justify-center gap-1.5 font-semibold text-[13px] whitespace-nowrap disabled:opacity-50 focus-visible:ring-2 focus-visible:ring-accent focus-visible:outline-none"
+              className="w-9 h-9 min-w-[36px] min-h-[36px] rounded-lg badge-accent hover:bg-accent/20 transition-all flex items-center justify-center disabled:opacity-50 focus-visible:ring-2 focus-visible:ring-accent focus-visible:outline-none"
             >
-              <RefreshCw className={`w-3.5 h-3.5 flex-shrink-0 ${isRetracking ? 'animate-spin' : ''}`} />
-              <span className="hidden sm:inline">Scrape now</span>
+              <RefreshCw className={`w-4 h-4 flex-shrink-0 ${isRetracking ? 'animate-spin' : ''}`} />
             </button>
           )}
 
