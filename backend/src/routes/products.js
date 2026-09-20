@@ -319,9 +319,9 @@ router.get('/products/:id/logs', async (req, res, next) => {
 });
 
 // -------------------------------------------------------------------
-// 6a. POST /api/products/scrape-all -> Rescrape all tracked products
+// 6a. GET / POST /api/products/scrape-all -> Rescrape all tracked products
 // -------------------------------------------------------------------
-router.post('/products/scrape-all', async (req, res, next) => {
+router.all('/products/scrape-all', async (req, res, next) => {
   try {
     const { data: products, error } = await supabase.from('products').select('*');
     if (error) throw new Error(`Database error: ${error.message}`);
