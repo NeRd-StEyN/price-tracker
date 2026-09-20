@@ -49,9 +49,9 @@ export async function getStats() {
 }
 
 // 2. Search Store Catalog
-export async function searchProducts(query) {
+export async function searchProducts(query, signal) {
   if (!query) return [];
-  return fetchWithSlowWarning(`${API_URL}/api/search?q=${encodeURIComponent(query)}`);
+  return fetchWithSlowWarning(`${API_URL}/api/search?q=${encodeURIComponent(query)}`, { signal });
 }
 
 // 3. Track Product

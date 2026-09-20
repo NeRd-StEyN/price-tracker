@@ -80,8 +80,12 @@ export async function scrapeProduct(productUrlOrId) {
   }
   productId = Number(productId);
 
-  // ── Step 1: Fetch product metadata ───────────────────────────────────────
-  const prodRes = await fetchWithTimeout(`${BASE_URL}/api/product/${productId}`);
+  // ── Step 1 & 2: Fetch product metadata and challenge concurrently ───────
+  const [prodRes, cr] = await Promise.all([
+    fetchWithTimeout(`${BASE_URL}/api/product/${productId}`),
+    fetchWithTimeout(`${BASE_URL}/api/challenge`)
+  ]);
+
   if (prodRes.status === 404) {
     throw new ScraperError('Product not found (404)', 404);
   }
@@ -90,8 +94,6 @@ export async function scrapeProduct(productUrlOrId) {
   }
   const productData = await prodRes.json();
 
-  // ── Step 2: Get a fresh anti-bot challenge ────────────────────────────────
-  const cr = await fetchWithTimeout(`${BASE_URL}/api/challenge`);
   if (!cr.ok) {
     throw new ScraperError(`Challenge endpoint returned ${cr.status}`, cr.status);
   }

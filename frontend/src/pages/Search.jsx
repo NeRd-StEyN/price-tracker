@@ -59,13 +59,23 @@ export default function Search() {
 
     setLoading(true);
     setError(null);
-    searchProducts(debouncedQuery)
+    
+    const controller = new AbortController();
+    
+    searchProducts(debouncedQuery, controller.signal)
       .then(data => {
         setResults(data);
         setDisplayCount(12);
       })
-      .catch(err => setError(err))
-      .finally(() => setLoading(false));
+      .catch(err => {
+        if (err.name === 'AbortError') return;
+        setError(err);
+      })
+      .finally(() => {
+        if (!controller.signal.aborted) setLoading(false);
+      });
+      
+    return () => controller.abort();
   }, [debouncedQuery]);
 
   // Handle tracking a search result item

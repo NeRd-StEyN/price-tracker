@@ -127,16 +127,30 @@ function formatProduct(product, historyList = [], logsList = []) {
 // -------------------------------------------------------------------
 router.get('/stats', async (req, res, next) => {
   try {
-    const { data: products, error: pErr } = await supabase
-      .from('products')
-      .select(`
-        id,
-        price_history ( price, in_stock, scraped_at )
-      `)
-      .order('scraped_at', { referencedTable: 'price_history', ascending: false })
-      .limit(1, { referencedTable: 'price_history' });
+    const sevenDaysAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString();
+    
+    // Parallelize both independent database queries
+    const [
+      { data: products, error: pErr },
+      { data: logs7d, error: lErr }
+    ] = await Promise.all([
+      supabase
+        .from('products')
+        .select(`
+          id,
+          price_history ( price, in_stock, scraped_at )
+        `)
+        .order('scraped_at', { referencedTable: 'price_history', ascending: false })
+        .limit(1, { referencedTable: 'price_history' }),
+      supabase
+        .from('scrape_logs')
+        .select('status, scraped_at')
+        .gte('scraped_at', sevenDaysAgo)
+        .order('scraped_at', { ascending: false })
+    ]);
 
     if (pErr) throw new Error(`Database error: ${pErr.message}`);
+    if (lErr) console.error('Failed to fetch 7d stats logs:', lErr);
 
     let tracked = products.length;
     let in_stock = 0;
@@ -152,15 +166,6 @@ router.get('/stats', async (req, res, next) => {
         out_of_stock++;
       }
     });
-
-    const sevenDaysAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString();
-    const { data: logs7d, error: lErr } = await supabase
-      .from('scrape_logs')
-      .select('status, scraped_at')
-      .gte('scraped_at', sevenDaysAgo)
-      .order('scraped_at', { ascending: false });
-
-    if (lErr) console.error('Failed to fetch 7d stats logs:', lErr);
 
     const attempts_7d = logs7d ? logs7d.length : 0;
     const successful_7d = logs7d ? logs7d.filter(l => ['success', 'retried'].includes(l.status)).length : 0;

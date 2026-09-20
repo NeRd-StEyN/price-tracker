@@ -159,140 +159,117 @@ router.get('/', async (req, res, next) => {
     // FALLBACK: if FTS column doesn't exist yet, falls back to ilike.
     const itemMap = new Map();
 
-    // 3a. Search catalog table via FTS
-    try {
-      const { data: ftsCatalog, error: ftsErr } = await supabase
-        .from('catalog')
-        .select('id, name, url, image_url')
-        .textSearch('search_vector', queryLower, { type: 'websearch', config: 'english' })
-        .limit(50);
-
-      if (!ftsErr && ftsCatalog) {
-        ftsCatalog.forEach(item => {
-          const extId = parseInt(item.id) || item.id;
-          const { brand, category } = inferMetadata(item.name);
-          itemMap.set(String(extId), {
-            id: String(item.id),
-            name: item.name,
-            brand,
-            sku: `SKU-${extId}`,
-            category,
-            external_id: extId,
-            url: item.url || `https://demo.inelabteamdev.com/product/${extId}`,
-            _source: 'fts_catalog'
-          });
-        });
-      } else {
-        // FTS not available yet — fallback to ilike
-        const { data: ilikeCatalog } = await supabase
-          .from('catalog')
-          .select('id, name, url, image_url')
-          .ilike('name', `%${queryLower}%`)
-          .limit(50);
-
-        (ilikeCatalog || []).forEach(item => {
-          const extId = parseInt(item.id) || item.id;
-          const { brand, category } = inferMetadata(item.name);
-          itemMap.set(String(extId), {
-            id: String(item.id),
-            name: item.name,
-            brand,
-            sku: `SKU-${extId}`,
-            category,
-            external_id: extId,
-            url: item.url || `https://demo.inelabteamdev.com/product/${extId}`,
-            _source: 'ilike_catalog'
-          });
-        });
-      }
-    } catch (e) {
-      console.error('[search] Catalog search error:', e.message);
-    }
-
-    // 3b. Search tracked products table
-    try {
-      const { data: ftsProducts, error: ftsErr2 } = await supabase
-        .from('products')
-        .select('id, name, external_id')
-        .textSearch('search_vector', queryLower, { type: 'websearch', config: 'english' })
-        .limit(50);
-
-      if (!ftsErr2 && ftsProducts) {
-        ftsProducts.forEach(p => {
-          const rawExt = String(p.external_id || '').replace(/[^0-9]/g, '') || String(p.id);
-          const extId  = parseInt(rawExt) || p.external_id || p.id;
-          const key    = String(extId);
-          if (!itemMap.has(key)) {
-            const { brand, category } = inferMetadata(p.name);
-            itemMap.set(key, {
-              id: String(p.id),
-              name: p.name,
-              brand,
-              sku: `SKU-${extId}`,
-              category,
-              external_id: extId,
-              url: `https://demo.inelabteamdev.com/product/${extId}`,
-              _source: 'fts_products'
-            });
-          }
-        });
-      } else {
-        // Fallback ilike for products table
-        const { data: ilikeProducts } = await supabase
-          .from('products')
-          .select('id, name, external_id')
-          .ilike('name', `%${queryLower}%`)
-          .limit(50);
-
-        (ilikeProducts || []).forEach(p => {
-          const rawExt = String(p.external_id || '').replace(/[^0-9]/g, '') || String(p.id);
-          const extId  = parseInt(rawExt) || p.external_id || p.id;
-          const key    = String(extId);
-          if (!itemMap.has(key)) {
-            const { brand, category } = inferMetadata(p.name);
-            itemMap.set(key, {
-              id: String(p.id),
-              name: p.name,
-              brand,
-              sku: `SKU-${extId}`,
-              category,
-              external_id: extId,
-              url: `https://demo.inelabteamdev.com/product/${extId}`,
-              _source: 'ilike_products'
-            });
-          }
-        });
-      }
-    } catch (e) {
-      console.error('[search] Products search error:', e.message);
-    }
-
-    // 3c. Direct numeric ID lookup (e.g. user types "251")
+    const terms = queryLower.split(/\\s+/).filter(Boolean);
     const numId = parseInt(queryLower.replace(/[^0-9]/g, ''));
-    if (numId && !itemMap.has(String(numId))) {
+
+    // Prepare Catalog FTS
+    const pCatalogFts = supabase
+      .from('catalog')
+      .select('id, name, url, image_url')
+      .textSearch('search_vector', queryLower, { type: 'websearch', config: 'english' })
+      .limit(50);
+
+    // Prepare Catalog ILIKE
+    let qCatalogIlike = supabase.from('catalog').select('id, name, url, image_url');
+    for (const term of terms) qCatalogIlike = qCatalogIlike.ilike('name', `%${term}%`);
+    const pCatalogIlike = qCatalogIlike.limit(50);
+
+    // Prepare Products FTS
+    const pProductsFts = supabase
+      .from('products')
+      .select('id, name, external_id')
+      .textSearch('search_vector', queryLower, { type: 'websearch', config: 'english' })
+      .limit(50);
+
+    // Prepare Products ILIKE
+    let qProductsIlike = supabase.from('products').select('id, name, external_id');
+    for (const term of terms) qProductsIlike = qProductsIlike.ilike('name', `%${term}%`);
+    const pProductsIlike = qProductsIlike.limit(50);
+
+    // Prepare Direct API
+    const pDirectApi = (async () => {
+      if (!numId) return null;
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 1500); // 1.5s max
       try {
-        const controller = new AbortController();
-        const timeoutId  = setTimeout(() => controller.abort(), 2000);
-        const directRes  = await fetch(
-          `https://demo.inelabteamdev.com/api/product/${numId}`,
-          { signal: controller.signal }
-        );
+        const res = await fetch(`https://demo.inelabteamdev.com/api/product/${numId}`, { signal: controller.signal });
         clearTimeout(timeoutId);
-        if (directRes.ok) {
-          const p = await directRes.json();
-          const { brand, category } = inferMetadata(p.name);
-          itemMap.set(String(p.id), {
-            id: String(p.id),
-            name: p.name,
-            brand: p.brand || brand,
-            sku: p.sku || `SKU-${p.id}`,
-            category: p.category || category,
-            external_id: parseInt(p.id) || p.id,
-            url: `https://demo.inelabteamdev.com/product/${p.id}`,
-            _source: 'direct_api'
+        if (res.ok) return await res.json();
+      } catch { /* skip */ }
+      return null;
+    })();
+
+    // ── FIRE ALL QUERIES IN PARALLEL ──────────────────────────────────────────
+    const [resCatFts, resCatIlike, resProdFts, resProdIlike, resApi] = await Promise.allSettled([
+      pCatalogFts, pCatalogIlike, pProductsFts, pProductsIlike, pDirectApi
+    ]);
+
+    // Process Catalog FTS
+    if (resCatFts.status === 'fulfilled' && !resCatFts.value.error && resCatFts.value.data) {
+      resCatFts.value.data.forEach(item => {
+        const extId = parseInt(item.id) || item.id;
+        const { brand, category } = inferMetadata(item.name);
+        itemMap.set(String(extId), {
+          id: String(item.id), name: item.name, brand, sku: `SKU-${extId}`, category,
+          external_id: extId, url: item.url || `https://demo.inelabteamdev.com/product/${extId}`, _source: 'fts_catalog'
+        });
+      });
+    }
+
+    // Process Catalog ILIKE
+    if (resCatIlike.status === 'fulfilled' && !resCatIlike.value.error && resCatIlike.value.data) {
+      resCatIlike.value.data.forEach(item => {
+        const extId = parseInt(item.id) || item.id;
+        if (!itemMap.has(String(extId))) {
+          const { brand, category } = inferMetadata(item.name);
+          itemMap.set(String(extId), {
+            id: String(item.id), name: item.name, brand, sku: `SKU-${extId}`, category,
+            external_id: extId, url: item.url || `https://demo.inelabteamdev.com/product/${extId}`, _source: 'ilike_catalog'
           });
         }
-      } catch { /* timeout or 404 — silently skip */ }
+      });
+    }
+
+    // Process Products FTS
+    if (resProdFts.status === 'fulfilled' && !resProdFts.value.error && resProdFts.value.data) {
+      resProdFts.value.data.forEach(p => {
+        const rawExt = String(p.external_id || '').replace(/[^0-9]/g, '') || String(p.id);
+        const extId = parseInt(rawExt) || p.external_id || p.id;
+        if (!itemMap.has(String(extId))) {
+          const { brand, category } = inferMetadata(p.name);
+          itemMap.set(String(extId), {
+            id: String(p.id), name: p.name, brand, sku: `SKU-${extId}`, category,
+            external_id: extId, url: `https://demo.inelabteamdev.com/product/${extId}`, _source: 'fts_products'
+          });
+        }
+      });
+    }
+
+    // Process Products ILIKE
+    if (resProdIlike.status === 'fulfilled' && !resProdIlike.value.error && resProdIlike.value.data) {
+      resProdIlike.value.data.forEach(p => {
+        const rawExt = String(p.external_id || '').replace(/[^0-9]/g, '') || String(p.id);
+        const extId = parseInt(rawExt) || p.external_id || p.id;
+        if (!itemMap.has(String(extId))) {
+          const { brand, category } = inferMetadata(p.name);
+          itemMap.set(String(extId), {
+            id: String(p.id), name: p.name, brand, sku: `SKU-${extId}`, category,
+            external_id: extId, url: `https://demo.inelabteamdev.com/product/${extId}`, _source: 'ilike_products'
+          });
+        }
+      });
+    }
+
+    // Process Direct API
+    if (resApi.status === 'fulfilled' && resApi.value) {
+      const p = resApi.value;
+      if (!itemMap.has(String(p.id))) {
+        const { brand, category } = inferMetadata(p.name);
+        itemMap.set(String(p.id), {
+          id: String(p.id), name: p.name, brand: p.brand || brand, sku: p.sku || `SKU-${p.id}`,
+          category: p.category || category, external_id: parseInt(p.id) || p.id, url: `https://demo.inelabteamdev.com/product/${p.id}`, _source: 'direct_api'
+        });
+      }
     }
 
     const results = Array.from(itemMap.values());
