@@ -216,7 +216,8 @@ router.all('/products/scrape-all', async (req, res, next) => {
     const { data: products, error } = await supabase.from('products').select('*');
     if (error) throw new Error(`Database error: ${error.message}`);
 
-    const results = await Promise.all(products.map(async (product) => {
+    // Fire and forget scraping to avoid HTTP timeouts and "Server warming up" warnings
+    Promise.allSettled(products.map(async (product) => {
       const startTime = Date.now();
       const scrapeResult = await scrapeWithRetry(product.external_id);
       const durationMs = Date.now() - startTime;
@@ -238,16 +239,9 @@ router.all('/products/scrape-all', async (req, res, next) => {
           in_stock: sd.inStock
         });
       }
+    })).catch(err => console.error('Background scrape-all failed:', err));
 
-      return {
-        product_id: product.id,
-        status: scrapeResult.status,
-        ok: scrapeResult.ok,
-        error_code: errorCode
-      };
-    }));
-
-    res.json({ ok: true, count: results.length, results });
+    res.status(202).json({ ok: true, message: `Background scrape started for ${products.length} products.` });
   } catch (err) {
     next(err);
   }
