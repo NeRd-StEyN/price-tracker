@@ -227,8 +227,8 @@ class RequestQueue {
   }
 }
 
-// Global queue: Max 2 concurrent scrapes, with 1000ms delay between completions
-const globalScrapeQueue = new RequestQueue(2, 1000);
+// Global queue: Max 1 concurrent scrape, with 1500ms delay to perfectly respect strict rate limits
+const globalScrapeQueue = new RequestQueue(1, 1500);
 
 /**
  * Core scraping logic wrapped with smart retry.
