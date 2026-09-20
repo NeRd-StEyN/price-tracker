@@ -1,6 +1,7 @@
 import { Router } from 'express';
 import { supabase } from '../db.js';
 import { scrapeWithRetry } from '../scraper/scraper.js';
+import { invalidateSearchCache } from './search.js';
 
 const router = Router();
 
@@ -515,6 +516,9 @@ router.post('/track', async (req, res, next) => {
       });
     }
 
+    // Invalidate search cache so new product appears immediately in search results
+    await invalidateSearchCache();
+
     res.status(201).json({
       message: 'Product tracked and scraped',
       product: productData,
@@ -537,6 +541,10 @@ router.delete('/products', async (req, res, next) => {
       .neq('id', '00000000-0000-0000-0000-000000000000');
 
     if (error) throw new Error(`Database error: ${error.message}`);
+
+    // Invalidate search cache so deleted products disappear from results immediately
+    await invalidateSearchCache();
+
     res.json({ ok: true, message: 'All products untracked' });
   } catch (err) {
     next(err);
@@ -554,6 +562,10 @@ router.delete('/products/:id', async (req, res, next) => {
       .eq('id', req.params.id);
 
     if (error) throw new Error(`Database error: ${error.message}`);
+
+    // Invalidate search cache so deleted product disappears from results immediately
+    await invalidateSearchCache();
+
     res.json({ ok: true, message: 'Product untracked' });
   } catch (err) {
     next(err);
