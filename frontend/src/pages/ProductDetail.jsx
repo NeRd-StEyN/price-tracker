@@ -8,7 +8,7 @@ import {
 } from 'lucide-react';
 
 import { 
-  getProductDetail, getProductHistory, getProductLogs, retrackProduct, updateScrapeInterval, untrackProduct 
+  getProductDetail, getProductHistory, getProductLogs, retrackProduct, untrackProduct 
 } from '../api';
 import { LoadingSkeleton, ErrorState, EmptyState } from '../components/StateComponents';
 import { formatRelativeTime, formatExactTime, formatPrice, mapErrorToFriendlyText, getCategoryIcon } from '../utils';
@@ -26,7 +26,6 @@ export default function ProductDetail() {
 
   const [scraping, setScraping] = useState(false);
   const [scrapeResultInline, setScrapeResultInline] = useState(null);
-  const [updatingInterval, setUpdatingInterval] = useState(false);
   const [untracking, setUntracking] = useState(false);
 
   const [chartRange, setChartRange] = useState('7d'); 
@@ -74,18 +73,7 @@ export default function ProductDetail() {
     }
   };
 
-  const handleIntervalChange = async (e) => {
-    const val = Number(e.target.value);
-    setUpdatingInterval(true);
-    try {
-      const updated = await updateScrapeInterval(id, val);
-      setProduct(prev => ({ ...prev, scrape_interval_minutes: updated.scrape_interval_minutes }));
-    } catch (err) {
-      alert(`Failed to update scrape interval: ${err.message}`);
-    } finally {
-      setUpdatingInterval(false);
-    }
-  };
+
 
   const handleUntrack = async () => {
     if (!window.confirm(`Are you sure you want to stop tracking "${product?.name}"?`)) return;
@@ -332,24 +320,6 @@ export default function ProductDetail() {
                 <RefreshCw className={`w-3.5 h-3.5 ${scraping ? 'animate-spin' : ''}`} />
                 <span>{scraping ? 'Scraping...' : 'Scrape now'}</span>
               </button>
-
-              {}
-              <div className="flex items-center gap-1.5 text-xs text-text-muted">
-                <Clock className="w-3.5 h-3.5 text-text-muted" />
-                <span>Interval:</span>
-                <select
-                  value={product.scrape_interval_minutes}
-                  onChange={handleIntervalChange}
-                  disabled={updatingInterval}
-                  className="bg-surface-2 border border-border text-text rounded-lg px-2.5 py-1 text-xs font-semibold focus:outline-none focus:border-accent cursor-pointer"
-                >
-                  <option value={60}>1h</option>
-                  <option value={120}>2h</option>
-                  <option value={360}>6h</option>
-                  <option value={720}>12h</option>
-                  <option value={1440}>24h</option>
-                </select>
-              </div>
             </div>
 
             <button
