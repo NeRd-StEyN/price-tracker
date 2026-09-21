@@ -2,7 +2,7 @@ import { Router } from 'express';
 import { supabase } from '../db.js';
 import { scrapeWithRetry } from '../scraper/scraper.js';
 import { invalidateSearchCache } from './search.js';
-import { runScheduledScrapes } from '../scheduler.js';
+import { runAllScrapes } from '../scraper/runAll.js';
 
 const router = Router();
 
@@ -207,9 +207,9 @@ router.get('/products', async (req, res, next) => {
 
 router.all('/products/scrape-all', (req, res, next) => {
   try {
-    // We defer to the scheduler which respects individual product scrape_interval_minutes.
+    // Run the unconditional scraper for all products immediately.
     // Fire and forget to avoid HTTP timeouts.
-    runScheduledScrapes().catch(err => console.error('Background scheduled scrape failed:', err));
+    runAllScrapes().catch(err => console.error('Background scrape-all failed:', err));
 
     // Return 204 No Content to prevent cron-job.org from complaining about chunked encoding length.
     res.status(204).end();

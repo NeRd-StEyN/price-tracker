@@ -22,7 +22,8 @@ export async function runScheduledScrapes() {
 
       const lastScrapedAt = lastLog ? new Date(lastLog.scraped_at).getTime() : 0;
 
-      if (now - lastScrapedAt >= intervalMs) {
+      // Add a 5 minute grace period to account for cron jobs running a few seconds/minutes early
+      if (now - lastScrapedAt >= (intervalMs - 5 * 60 * 1000)) {
         console.log(`[SCHEDULER] Product "${product.name}" is due for rescrape (Interval: ${intervalMinutes}m). Scraping...`);
         const startTime = Date.now();
         const scrapeResult = await scrapeWithRetry(product.external_id);
