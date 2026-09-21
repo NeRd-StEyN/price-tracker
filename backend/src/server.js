@@ -51,8 +51,6 @@ app.listen(port, async () => {
     console.log(`Catalog already has ${count} items. Skipping initial startup sync to prevent rate-limits.`);
   }
 
-  setInterval(syncCatalog, 24 * 60 * 60 * 1000);
-
-  setTimeout(() => runScheduledScrapes(), 10000);
-  setInterval(runScheduledScrapes, 5 * 60 * 1000);
+  // Automatic internal background scraping disabled. 
+  // We rely on external cron jobs for scheduling to prevent out-of-memory crashes.
 });
