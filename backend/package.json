@@ -8,11 +8,9 @@
     "start": "node src/server.js",
     "dev": "nodemon src/server.js",
     "test:scrape": "node scripts/test-scrape.js",
-    "test:alert": "node scripts/test-alert.js",
     "scrape:headed": "node scripts/scrape-headed.js"
   },
   "dependencies": {
-    "@sendgrid/mail": "^8.1.6",
     "@supabase/supabase-js": "^2.116.0",
     "cors": "^2.8.6",
     "dotenv": "^18.0.1",

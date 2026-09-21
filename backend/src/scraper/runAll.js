@@ -1,6 +1,5 @@
 import { supabase } from '../db.js';
 import { scrapeWithRetry, closeScraper } from './scraper.js';
-import { sendAlertEmail } from '../utils/email.js';
 
 export let isScraping = false;
 
@@ -47,57 +46,16 @@ export async function runAllScrapes() {
         if (logErr) console.error(`Log DB error for ${product.id}:`, logErr);
 
         if (result.ok && result.data) {
-          const newPrice = parseFloat(result.data.price);
-          const newInStock = result.data.inStock ? true : false;
-
-          const { data: previousHistory } = await supabase
-            .from('price_history')
-            .select('price, in_stock')
-            .eq('product_id', product.id)
-            .order('scraped_at', { ascending: false })
-            .limit(1)
-            .single();
-
-          if (previousHistory) {
-            const oldPrice = parseFloat(previousHistory.price);
-            const oldInStock = previousHistory.in_stock;
-
-            if (newPrice < oldPrice) {
-              const subject = `📉 Price Drop Alert: ${product.name}`;
-              const htmlBody = `
-                <h2>Price Drop Alert!</h2>
-                <p>Great news! The price for <strong>${product.name}</strong> has dropped.</p>
-                <ul>
-                  <li><strong>Old Price:</strong> $${oldPrice}</li>
-                  <li><strong>New Price:</strong> $${newPrice}</li>
-                </ul>
-                <p>Check your dashboard for more details.</p>
-              `;
-              await sendAlertEmail(subject, htmlBody);
-            }
-
-            if (oldInStock === false && newInStock === true) {
-              const subject = `📦 Back in Stock Alert: ${product.name}`;
-              const htmlBody = `
-                <h2>Back in Stock Alert!</h2>
-                <p>The product <strong>${product.name}</strong> is finally back in stock!</p>
-                <p><strong>Current Price:</strong> $${newPrice}</p>
-                <p>Hurry and check your dashboard to grab it.</p>
-              `;
-              await sendAlertEmail(subject, htmlBody);
-            }
-          }
-
           const { error: histErr } = await supabase.from('price_history').insert({
             product_id: product.id,
-            price: newPrice,
-            in_stock: newInStock
+            price: result.data.price,
+            in_stock: result.data.inStock ? true : false
           });
           
           if (histErr) {
             console.error(`History DB error for ${product.id}:`, histErr);
           } else {
-            console.log(`[SUCCESS] ${product.name}: $${newPrice} (${newInStock ? 'In Stock' : 'Out of Stock'})`);
+            console.log(`[SUCCESS] ${product.name}: $${result.data.price} (${result.data.inStock ? 'In Stock' : 'Out of Stock'})`);
           }
         } else {
           console.log(`[FAILED] ${product.name}: ${result.message}`);
