@@ -2,6 +2,7 @@ import { Router } from 'express';
 import { supabase } from '../db.js';
 import { scrapeWithRetry } from '../scraper/scraper.js';
 import { invalidateSearchCache } from './search.js';
+import { runScheduledScrapes } from '../scheduler.js';
 
 const router = Router();
 
@@ -204,36 +205,13 @@ router.get('/products', async (req, res, next) => {
   }
 });
 
-router.all('/products/scrape-all', async (req, res, next) => {
+router.all('/products/scrape-all', (req, res, next) => {
   try {
-    const { data: products, error } = await supabase.from('products').select('*');
-    if (error) throw new Error(`Database error: ${error.message}`);
+    // We defer to the scheduler which respects individual product scrape_interval_minutes.
+    // Fire and forget to avoid HTTP timeouts.
+    runScheduledScrapes().catch(err => console.error('Background scheduled scrape failed:', err));
 
-    Promise.allSettled(products.map(async (product) => {
-      const startTime = Date.now();
-      const scrapeResult = await scrapeWithRetry(product.external_id);
-      const durationMs = Date.now() - startTime;
-      const errorCode = mapErrorCode(scrapeResult.status, scrapeResult.message);
-
-      await supabase.from('scrape_logs').insert({
-        product_id: product.id,
-        status: scrapeResult.status,
-        attempts: scrapeResult.attempts,
-        message: scrapeResult.message,
-        duration_ms: durationMs
-      });
-
-      if (scrapeResult.ok && scrapeResult.data) {
-        const sd = scrapeResult.data;
-        await supabase.from('price_history').insert({
-          product_id: product.id,
-          price: sd.price,
-          in_stock: sd.inStock
-        });
-      }
-    })).catch(err => console.error('Background scrape-all failed:', err));
-
-    res.status(202).json({ ok: true, message: `Background scrape started for ${products.length} products.` });
+    res.status(202).json({ ok: true, message: 'Background scheduled scrape triggered. Only products due for scraping will be updated.' });
   } catch (err) {
     next(err);
   }
