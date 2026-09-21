@@ -211,7 +211,8 @@ router.all('/products/scrape-all', (req, res, next) => {
     // Fire and forget to avoid HTTP timeouts.
     runScheduledScrapes().catch(err => console.error('Background scheduled scrape failed:', err));
 
-    res.status(202).json({ ok: true, message: 'Background scheduled scrape triggered. Only products due for scraping will be updated.' });
+    // Return 204 No Content to prevent cron-job.org from complaining about chunked encoding length.
+    res.status(204).end();
   } catch (err) {
     next(err);
   }
