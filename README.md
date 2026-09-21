@@ -1,38 +1,38 @@
 # INE Intern Assignment - Product Price Tracker
 
-A high-performance, full-stack web application built for the INE Software Engineer Intern Assignment. It tracks product prices and stock availability from a custom mock store over time, featuring an ultra-fast backend scraper, a resilient PostgreSQL database (Supabase), and a Neo-Brutalist React dashboard.
+A high-performance, full-stack web application built for the INE Software Engineer Intern Assignment. It tracks product prices and stock availability from a custom mock store over time, featuring an ultra-fast backend scraper, a resilient PostgreSQL database (Supabase), and a beautiful Neo-Brutalist React dashboard.
 
-## Live Demo
-- **Frontend**: [Your Vercel URL Here]
-- **Backend**: https://price-tracker-backend-6kew.onrender.com
+## 🚀 Live Demo
+- **Frontend Dashboard**: [https://ine-price-tracker1.vercel.app/](https://ine-price-tracker1.vercel.app/)
+- **Backend API**: [https://price-tracker-backend-6kew.onrender.com](https://price-tracker-backend-6kew.onrender.com)
 
-## Tech Stack
-- **Frontend**: React (Vite) + Tailwind CSS (deployed on Vercel)
-- **Backend**: Node.js + Express (deployed on Render)
+## 🛠️ Tech Stack
+- **Frontend**: React, Vite, Tailwind CSS (Hosted on Vercel)
+- **Backend**: Node.js, Express (Hosted on Render)
 - **Database**: Supabase (PostgreSQL)
 
-## Scraping & Scheduling Configuration
+## ⚙️ Scraping & Scheduling Architecture
 
-### The Scraper
-The mock store features a client-side anti-bot puzzle (WASM proof-of-work) to prevent automated fetching. Instead of relying on a slow, resource-heavy headless browser (like Playwright/Puppeteer), the scraper **reverse-engineers the WASM cryptographic challenge** natively in Node.js. 
+### The Anti-Bot Bypass Scraper
+The target mock store features a client-side anti-bot puzzle (WASM proof-of-work) to prevent automated fetching. Instead of relying on a slow, memory-heavy headless browser (like Playwright/Puppeteer), this scraper **reverse-engineers the WASM cryptographic challenge** natively in Node.js. 
 
-This allows for incredibly fast, lightweight HTTP fetching that bypasses the anti-bot firewall in milliseconds.
+This allows for incredibly fast, lightweight HTTP fetching that bypasses the anti-bot firewall in milliseconds without crashing the server.
 
-### Scheduled Execution (cron-job.org)
-Because this project is deployed on Render's free tier, the instance automatically sleeps after 15 minutes of inactivity. To keep the scraper running unattended indefinitely:
+### Automated Cloud Scheduling
+Because the backend is hosted on Render's free tier (which sleeps after 15 minutes of inactivity), we use `cron-job.org` to keep the server awake and completely automate the scraping process 24/7:
 
-1. **Keep-Alive Ping (Every 14 minutes):**
-   - URL: `https://price-tracker-backend-6kew.onrender.com/health`
-   - Method: `GET`
-   - Purpose: Prevents the Render instance from going to sleep.
+1. **Keep-Alive Ping (Every 1 minute):**
+   - **URL:** `https://price-tracker-backend-6kew.onrender.com/health`
+   - **Method:** `GET`
+   - **Purpose:** Constantly pings the lightweight health endpoint to ensure the Render server stays awake 24/7, completely preventing 502 wake-up crash errors.
 
 2. **Trigger Scrape (Every 2 hours):**
-   - URL: `https://price-tracker-backend-6kew.onrender.com/api/products/scrape-all`
-   - Method: `POST`
-   - Purpose: Initiates the background scrape queue for all tracked products.
-   - Note: The backend uses a specialized sequential queue with a strict 1500ms delay between requests to completely avoid `429 Too Many Requests` bans from the mock store during bulk operations.
+   - **URL:** `https://price-tracker-backend-6kew.onrender.com/api/products/scrape-all`
+   - **Method:** `GET`
+   - **Purpose:** Instantly triggers a background scrape for all tracked products.
+   - **Safety:** The backend uses a specialized sequential queue with a strict 1500ms delay between product scrapes to completely avoid `429 Too Many Requests` IP bans from the mock store during bulk operations.
 
-## Local Setup Instructions
+## 💻 Local Setup Instructions
 
 ### 1. Database (Supabase)
 Create a new Supabase project and run the provided SQL scripts (if any) to generate the `products`, `scrape_logs`, and `price_history` tables.
@@ -51,21 +51,21 @@ VITE_API_URL=http://localhost:3000
 ```
 
 ### 3. Run Locally
-Start the backend:
+**Start the backend:**
 ```bash
 cd backend
 npm install
 npm run dev
 ```
 
-Start the frontend:
+**Start the frontend:**
 ```bash
 cd frontend
 npm install
 npm run dev
 ```
 
-## Headed Mode Recording (Grading Requirement)
+## 🎥 Headed Mode Recording (Grading Requirement)
 The grading rubric requests a screen recording of the scraper running in a "headed" browser. Because our primary scraper is highly optimized and runs completely headlessly via raw HTTP/WASM execution, we have provided a secondary fallback script specifically for this grading requirement.
 
 To run the headed Playwright script and record your video:
