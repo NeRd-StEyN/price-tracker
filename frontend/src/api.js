@@ -27,6 +27,10 @@ async function fetchWithSlowWarning(url, options = {}) {
       throw new Error(errMsg);
     }
 
+    if (res.status === 204) {
+      return null;
+    }
+    
     return await res.json();
   } finally {
     clearTimeout(slowTimeoutId);
