@@ -1,12 +1,15 @@
 import { supabase } from '../db.js';
 import { invalidateSearchCache } from '../routes/search.js';
 
-export async function syncCatalog() {
-  console.log('[SYNC] Starting Catalog Sync...');
+let isCatalogSyncing = false;
 
-  const { data: existingData } = await supabase.from('catalog').select('id');
-  const existingIds = new Set(existingData?.map(row => String(row.id)) || []);
-  const seenIds     = new Set(); 
+export async function syncCatalog() {
+  if (isCatalogSyncing) {
+    console.log('[SYNC] Catalog sync already in progress, skipping duplicate call.');
+    return { ok: false, message: 'Catalog sync already in progress' };
+  }
+  isCatalogSyncing = true;
+  console.log('[SYNC] Starting Catalog Sync with INE Official Store...');
 
   let totalUpserted = 0;
   let currentPage   = 1;
@@ -14,7 +17,6 @@ export async function syncCatalog() {
   let hadChanges    = false;
 
   try {
-    
     while (currentPage <= totalPages) {
       console.log(`[SYNC]   Fetching page ${currentPage} of ${totalPages}...`);
       const url = `https://demo.inelabteamdev.com/api/catalog?page=${currentPage}&pageSize=100`;
@@ -23,7 +25,6 @@ export async function syncCatalog() {
 
       if (!response.ok) {
         if (response.status === 429) {
-          
           console.warn(`[SYNC]   Rate limited (429) on page ${currentPage}. Backing off 10s...`);
           await new Promise(r => setTimeout(r, 10000));
           continue;
@@ -41,7 +42,6 @@ export async function syncCatalog() {
 
       const batch = items.map(item => {
         const id = String(item.id);
-        seenIds.add(id);
         return {
           id,
           name:         item.name,
@@ -68,37 +68,26 @@ export async function syncCatalog() {
       }
 
       currentPage++;
-      
       await new Promise(r => setTimeout(r, 1500));
     }
 
-    const deletedIds = [...existingIds].filter(id => !seenIds.has(id));
-
-    if (deletedIds.length > 0) {
-      console.log(`[SYNC] Removing ${deletedIds.length} products no longer on the INE store...`);
-      const { error: delError } = await supabase
-        .from('catalog')
-        .delete()
-        .in('id', deletedIds);
-
-      if (delError) {
-        console.error('[SYNC]   Delete error:', delError.message);
-      } else {
-        hadChanges = true;
-        console.log(`[SYNC]   Deleted ${deletedIds.length} stale catalog entries.`);
-      }
-    } else {
-      console.log('[SYNC]   No deletions detected. All existing catalog items still present on INE.');
-    }
+    // Preservation policy: We do NOT delete products that are missing/removed from the INE store.
+    // All items remain stored in our database for historical tracking.
+    console.log('[SYNC]   Preserved all existing products in DB (no deletions applied for removed store items).');
 
     if (hadChanges) {
       await invalidateSearchCache();
       console.log('[SYNC]   Search cache invalidated — new catalog is live.');
     }
 
-    console.log(`[SYNC] ✅ Complete. Upserted: ${totalUpserted}, Deleted: ${deletedIds?.length ?? 0}, Total in DB: ${seenIds.size}`);
+    console.log(`[SYNC] ✅ Catalog sync complete. Upserted/Updated: ${totalUpserted} products.`);
+    return { ok: true, upserted: totalUpserted };
 
   } catch (err) {
     console.error('[SYNC] ❌ Error during catalog sync:', err.message);
+    return { ok: false, error: err.message };
+  } finally {
+    isCatalogSyncing = false;
   }
 }
+

@@ -1,5 +1,6 @@
 import { Router } from 'express';
 import { runAllScrapes, isScraping } from '../scraper/runAll.js';
+import { syncCatalog } from '../scraper/syncCatalog.js';
 
 const router = Router();
 
@@ -14,9 +15,7 @@ const requireCronSecret = (req, res, next) => {
 router.use(requireCronSecret);
 
 const handleScrapeRequest = (req, res) => {
-  
   if (isScraping) {
-    
     return res.status(202).json({
       started: false,
       reason: 'already running'
@@ -32,7 +31,18 @@ const handleScrapeRequest = (req, res) => {
   });
 };
 
+router.post('/sync-catalog', (req, res) => {
+  syncCatalog().catch(err => {
+    console.error('Background catalog sync failed:', err);
+  });
+  return res.status(202).json({
+    started: true,
+    message: 'Catalog sync initiated'
+  });
+});
+
 router.post('/', handleScrapeRequest);
 router.get('/', handleScrapeRequest);
 
 export default router;
+

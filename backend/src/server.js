@@ -48,9 +48,14 @@ app.listen(port, async () => {
     console.log('Catalog is empty. Running initial sync...');
     syncCatalog();
   } else {
-    console.log(`Catalog already has ${count} items. Skipping initial startup sync to prevent rate-limits.`);
+    console.log(`Catalog already has ${count} items. Initial startup sync skipped.`);
   }
 
-  // Automatic internal background scraping disabled. 
-  // We rely on external cron jobs for scheduling to prevent out-of-memory crashes.
+  // Automatic daily store catalog sync (runs every 24 hours)
+  const TWENTY_FOUR_HOURS = 24 * 60 * 60 * 1000;
+  setInterval(() => {
+    console.log('[SERVER] Running scheduled daily catalog sync with INE official store...');
+    syncCatalog().catch(err => console.error('[SERVER] Daily catalog sync error:', err));
+  }, TWENTY_FOUR_HOURS);
 });
+

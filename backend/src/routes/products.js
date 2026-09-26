@@ -3,6 +3,7 @@ import { supabase } from '../db.js';
 import { scrapeWithRetry } from '../scraper/scraper.js';
 import { invalidateSearchCache } from './search.js';
 import { runAllScrapes } from '../scraper/runAll.js';
+import { syncCatalog } from '../scraper/syncCatalog.js';
 
 const router = Router();
 
@@ -511,6 +512,15 @@ router.delete('/products/:id', async (req, res, next) => {
     await invalidateSearchCache();
 
     res.json({ ok: true, message: 'Product untracked' });
+  } catch (err) {
+    next(err);
+  }
+});
+
+router.post('/sync-catalog', async (req, res, next) => {
+  try {
+    syncCatalog().catch(err => console.error('Catalog sync error:', err));
+    res.status(202).json({ ok: true, message: 'Catalog sync started' });
   } catch (err) {
     next(err);
   }
